@@ -1,231 +1,288 @@
+"use client";
+
 import Link from "next/link";
-import { Code2, Shield, GitBranch, ArrowRight } from "lucide-react";
-import { db } from "@/lib/db";
-import { servers, scans } from "@/db/schema";
-import { sql, isNotNull, desc, eq } from "drizzle-orm";
+import { motion } from "framer-motion";
+import {
+  Shield,
+  Bug,
+  Lock,
+  Globe,
+  BarChart3,
+  Github,
+  ArrowRight,
+  ChevronDown,
+} from "lucide-react";
 import { HomeSearchBar } from "@/components/scanner/HomeSearchBar";
+import { JsonLd } from "@/components/JsonLd";
+import { useState } from "react";
 
-export const revalidate = 300;
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+};
 
-export default async function HomePage() {
-  let totalServers = 0;
-  let totalFindings = 0;
-  let recentServers: {
-    id: string;
-    name: string;
-    owner: string;
-    repo: string;
-    latestGrade: string | null;
-    latestScore: number | null;
-    findingsCount: number | null;
-    lastScannedAt: Date | null;
-  }[] = [];
+const stagger = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.2 } },
+};
 
-  try {
-    const [sc] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(servers)
-      .where(isNotNull(servers.latestGrade));
-    totalServers = sc.count;
+const staggerItem = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
 
-    const [fs] = await db
-      .select({ total: sql<number>`coalesce(sum(${scans.findingsCount}), 0)::int` })
-      .from(scans)
-      .where(eq(scans.status, "completed"));
-    totalFindings = fs.total;
+const features = [
+  { icon: Shield, title: "Tool Poisoning Detection", desc: "Detect hidden instructions in MCP tool descriptions that manipulate AI agents into performing unintended actions." },
+  { icon: Bug, title: "Prompt Injection Scanning", desc: "Find injection vulnerabilities in tool parameters, responses, and metadata across 14 detection rules." },
+  { icon: Lock, title: "Rug Pull Prevention", desc: "Track tool definition changes between scans with SHA-256 hashing to detect post-approval behavior modifications." },
+  { icon: Globe, title: "Cross-Origin Detection", desc: "Identify shadow MCP servers, proxy relays, and undocumented tool registrations that expand the attack surface." },
+  { icon: BarChart3, title: "Security Leaderboard", desc: "Public rankings of MCP servers by security score. Every scan is graded A through F with OWASP mapping." },
+  { icon: Github, title: "Open Source & Free", desc: "122 detection rules, SARIF exports, CI/CD integration, config scanning, and bulk analysis — all free forever." },
+];
 
-    recentServers = await db
-      .select({
-        id: servers.id,
-        name: servers.name,
-        owner: servers.owner,
-        repo: servers.repo,
-        latestGrade: servers.latestGrade,
-        latestScore: servers.latestScore,
-        findingsCount: scans.findingsCount,
-        lastScannedAt: scans.completedAt,
-      })
-      .from(servers)
-      .leftJoin(scans, eq(servers.latestScanId, scans.id))
-      .where(isNotNull(servers.latestGrade))
-      .orderBy(desc(servers.updatedAt))
-      .limit(5);
-  } catch {
-    /* render with defaults */
-  }
+const faqs = [
+  { q: "What is MCP Scanner?", a: "MCP Scanner is a free, open-source security tool that scans Model Context Protocol (MCP) servers for vulnerabilities including tool poisoning, prompt injection, rug pulls, and cross-origin escalation attacks." },
+  { q: "What vulnerabilities does it detect?", a: "122 rules across 15 categories: tool poisoning, command injection, path traversal, SSRF, credential theft, excessive permissions, missing auth, supply chain risks, rug pulls, data exfiltration, insecure communication, and more. Every finding maps to the OWASP MCP Top 10." },
+  { q: "Is MCP Scanner free?", a: "Yes. MCP Scanner is completely free and open source. All features — scanning, config analysis, bulk scan, CI/CD integration, API access, webhooks — are available at no cost." },
+  { q: "How does the security leaderboard work?", a: "Every scanned server receives a grade from A (excellent) to F (critical risk) based on 122 security rules. Scores factor in finding severity, confidence levels, and category coverage. The leaderboard ranks all scanned servers publicly." },
+  { q: "What is the Model Context Protocol?", a: "MCP is an open protocol that connects AI assistants like Claude, ChatGPT, and Cursor to external tools and data sources. MCP servers provide capabilities (file access, APIs, databases) that AI agents can invoke during conversations." },
+];
 
-  const gradeColor: Record<string, string> = {
-    A: "bg-emerald-500",
-    B: "bg-blue-500",
-    C: "bg-amber-500",
-    D: "bg-orange-500",
-    F: "bg-red-500",
-  };
+function FAQ({ q, a }: { q: string; a: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="border-b border-white/10">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex w-full items-center justify-between py-5 text-left"
+        aria-expanded={open}
+      >
+        <span className="text-[15px] font-medium text-foreground">{q}</span>
+        <ChevronDown
+          className={`size-4 shrink-0 text-muted transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          aria-hidden="true"
+        />
+      </button>
+      {open && (
+        <p className="pb-5 text-sm text-muted leading-relaxed">{a}</p>
+      )}
+    </div>
+  );
+}
 
+export default function HomePage() {
   return (
     <>
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "WebApplication",
+          name: "MCP Scanner",
+          url: "https://mcp-scanner-kappa.vercel.app",
+          applicationCategory: "SecurityApplication",
+          operatingSystem: "Any",
+          description: "Free security scanner for Model Context Protocol (MCP) servers. Detects tool poisoning, prompt injection, rug pulls, and cross-origin attacks.",
+          offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+          featureList: ["Tool Poisoning Detection", "Prompt Injection Scanning", "Rug Pull Prevention", "Cross-Origin Escalation Detection", "Security Leaderboard"],
+        }}
+      />
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: faqs.map((f) => ({
+            "@type": "Question",
+            name: f.q,
+            acceptedAnswer: { "@type": "Answer", text: f.a },
+          })),
+        }}
+      />
+
       {/* Hero */}
-      <section className="relative pt-32 pb-24 text-center">
-        <div className="absolute inset-0 dot-grid opacity-50" aria-hidden="true" />
-        <div className="relative">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-medium tracking-tight text-balance">
-            Secure your MCP servers
-          </h1>
-          <p className="mt-4 text-lg text-[var(--fg-faint)] max-w-xl mx-auto text-pretty">
-            Free security scanning for Model Context Protocol servers.
-            122 rules. OWASP mapped. CI/CD ready.
-          </p>
-          <div className="mt-10 max-w-lg mx-auto">
-            <HomeSearchBar />
-          </div>
-          <p className="mt-4 text-sm text-[var(--fg-ghost)]">
-            Try:{" "}
-            <Link
-              href="/scan?q=modelcontextprotocol/servers"
-              className="text-[var(--accent)] hover:underline"
-            >
-              modelcontextprotocol/servers
+      <section className="relative flex min-h-[90vh] flex-col items-center justify-center px-4 text-center">
+        {/* Background */}
+        <div className="fixed inset-0 -z-10 h-full w-full bg-background dot-grid" aria-hidden="true" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[500px] w-[800px] rounded-full bg-brand-500/10 blur-3xl pointer-events-none" aria-hidden="true" />
+
+        <motion.div
+          className="relative z-10 max-w-4xl mx-auto"
+          initial="hidden"
+          animate="visible"
+          variants={stagger}
+        >
+          {/* Status badge */}
+          <motion.div variants={staggerItem} className="mb-6 inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-gray-300">
+            <span className="mr-2 size-2 rounded-full bg-secure animate-pulse" aria-hidden="true" />
+            Open Source — Free Forever
+          </motion.div>
+
+          <motion.h1
+            variants={staggerItem}
+            className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-foreground leading-[1.1]"
+          >
+            Scan your MCP servers{" "}
+            <span className="bg-gradient-to-r from-brand-400 to-accent-400 bg-clip-text text-transparent">
+              before attackers do
+            </span>
+          </motion.h1>
+
+          <motion.p
+            variants={staggerItem}
+            className="mt-6 text-lg text-muted max-w-2xl mx-auto leading-relaxed"
+          >
+            MCP Scanner is a free, open-source security tool that detects tool poisoning,
+            prompt injection, rug pulls, and cross-origin escalation attacks in Model Context
+            Protocol servers. Trusted by developers to protect AI agent workflows.
+          </motion.p>
+
+          <motion.div variants={staggerItem} className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link href="/scan" className="btn-primary">
+              Scan Now — Free
             </Link>
-          </p>
-        </div>
+            <Link
+              href="https://github.com/NOTTIBOY137/mcp-scanner"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-secondary"
+            >
+              View on GitHub <ArrowRight className="size-4" aria-hidden="true" />
+            </Link>
+          </motion.div>
+        </motion.div>
       </section>
 
-      {/* Stats — single line */}
-      <section
-        className="py-6 text-center text-sm text-[var(--fg-faint)] border-y border-[var(--border)]"
-        aria-label="Statistics"
+      {/* Stats */}
+      <motion.section
+        className="py-20 px-4"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={stagger}
       >
-        <p>
-          <span className="text-[var(--fg)] font-medium" style={{ fontFamily: "'Geist Mono', monospace" }}>
-            {totalServers}
-          </span>{" "}
-          servers scanned{" · "}
-          <span className="text-[var(--fg)] font-medium" style={{ fontFamily: "'Geist Mono', monospace" }}>
-            {totalFindings.toLocaleString()}
-          </span>{" "}
-          vulnerabilities found{" · "}
-          <span className="text-[var(--fg)] font-medium" style={{ fontFamily: "'Geist Mono', monospace" }}>
-            122
-          </span>{" "}
-          detection rules
-        </p>
-      </section>
-
-      {/* Features — 3 cards */}
-      <section className="py-24">
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-3 max-w-3xl mx-auto">
           {[
-            {
-              icon: Code2,
-              title: "Source Code Analysis",
-              desc: "Scan GitHub repos for 15 categories of vulnerabilities including tool poisoning, injection, and credential theft.",
-              href: "/scan",
-            },
-            {
-              icon: Shield,
-              title: "Config Scanner",
-              desc: "Paste your MCP config to find hardcoded secrets, dangerous permissions, and insecure server settings.",
-              href: "/config-scan",
-            },
-            {
-              icon: GitBranch,
-              title: "CI/CD Integration",
-              desc: "GitHub Actions workflow that blocks unsafe MCP servers in every pull request.",
-              href: "/integrations",
-            },
-          ].map(({ icon: Icon, title, desc, href }) => (
-            <div key={title} className="card group">
-              <Icon className="size-6 text-[var(--fg-ghost)] mb-4" aria-hidden="true" />
-              <h3 className="text-base font-medium">{title}</h3>
-              <p className="mt-2 text-sm text-[var(--fg-faint)] text-pretty leading-relaxed">
-                {desc}
+            { value: "122", label: "Detection Rules" },
+            { value: "15", label: "Vulnerability Categories" },
+            { value: "10/10", label: "OWASP MCP Coverage" },
+          ].map(({ value, label }) => (
+            <motion.div
+              key={label}
+              variants={staggerItem}
+              className="rounded-xl border border-white/10 bg-gradient-to-b from-white/5 to-transparent p-6 text-center"
+            >
+              <p className="text-4xl font-bold tracking-tight text-foreground font-mono">
+                {value}
               </p>
-              <Link
-                href={href}
-                className="mt-4 inline-flex items-center gap-1 text-sm text-[var(--accent)] hover:underline"
-              >
-                Learn more <ArrowRight className="size-3.5" aria-hidden="true" />
-              </Link>
-            </div>
+              <p className="mt-1 text-sm text-muted">{label}</p>
+            </motion.div>
           ))}
         </div>
-      </section>
+      </motion.section>
 
-      {/* Recently Scanned — compact list */}
-      {recentServers.length > 0 && (
-        <section className="pb-24">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-medium">Recently scanned</h2>
-            <Link
-              href="/leaderboard"
-              className="text-sm text-[var(--fg-faint)] hover:text-[var(--fg-muted)] transition-colors"
+      {/* What is MCP Scanner */}
+      <motion.section
+        className="py-20 px-4"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={fadeUp}
+      >
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight">
+            What is MCP Scanner?
+          </h2>
+          <p className="mt-4 text-muted leading-relaxed">
+            MCP Scanner (also known as MCPGuard) is a security scanning platform that analyzes
+            Model Context Protocol (MCP) servers for vulnerabilities. MCP is the protocol that
+            connects AI agents like Claude, ChatGPT, and Cursor to external tools and data sources.
+            MCP Scanner checks these connections for tool poisoning attacks, prompt injection
+            vulnerabilities, rug pull risks (where tool behavior changes after approval), and
+            cross-origin privilege escalation. It maintains a public leaderboard ranking MCP servers
+            by security score, helping developers choose safe integrations for their AI agent workflows.
+          </p>
+        </div>
+      </motion.section>
+
+      {/* Features */}
+      <motion.section
+        className="py-20 px-4"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={stagger}
+      >
+        <motion.h2
+          variants={staggerItem}
+          className="text-3xl sm:text-4xl font-semibold tracking-tight text-center mb-12"
+        >
+          Built for MCP security
+        </motion.h2>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {features.map(({ icon: Icon, title, desc }) => (
+            <motion.div
+              key={title}
+              variants={staggerItem}
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              className="group relative rounded-xl border border-white/10 bg-card p-6 transition-all duration-300 hover:border-white/20 hover:bg-card-hover"
             >
-              View all <ArrowRight className="inline size-3.5" aria-hidden="true" />
-            </Link>
-          </div>
-          <div className="border border-[var(--border)] rounded-xl overflow-hidden">
-            {recentServers.map((server, i) => (
-              <Link
-                key={server.id}
-                href={`/server/${server.id}`}
-                className={`flex items-center gap-4 px-4 py-3.5 hover:bg-[var(--bg-muted)] transition-colors ${
-                  i < recentServers.length - 1 ? "border-b border-[var(--border)]" : ""
-                }`}
-              >
-                {/* Grade badge */}
-                <div
-                  className={`size-7 rounded-full flex items-center justify-center text-xs font-semibold text-white shrink-0 ${
-                    gradeColor[server.latestGrade ?? "F"] ?? "bg-zinc-600"
-                  }`}
-                >
-                  {server.latestGrade ?? "–"}
-                </div>
+              <div className="mb-4 flex size-10 items-center justify-center rounded-lg bg-white/5">
+                <Icon className="size-5 text-brand-400" aria-hidden="true" />
+              </div>
+              <h3 className="text-lg font-semibold text-foreground">{title}</h3>
+              <p className="mt-2 text-sm text-muted leading-relaxed">{desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </motion.section>
 
-                {/* Server info */}
-                <div className="flex-1 min-w-0">
-                  <span className="text-sm text-[var(--fg)]">
-                    {server.owner}/{server.repo}
-                  </span>
-                </div>
-
-                {/* Score */}
-                <span
-                  className="text-sm text-[var(--fg-faint)] tabular-nums"
-                  style={{ fontFamily: "'Geist Mono', monospace" }}
-                >
-                  {server.latestScore ?? "–"}/100
-                </span>
-
-                {/* Findings */}
-                <span className="text-sm text-[var(--fg-ghost)] tabular-nums w-20 text-right">
-                  {server.findingsCount ?? 0} findings
-                </span>
-
-                {/* Time */}
-                <span className="text-xs text-[var(--fg-ghost)] w-16 text-right hidden sm:block">
-                  {server.lastScannedAt
-                    ? new Date(server.lastScannedAt).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                      })
-                    : "–"}
-                </span>
-              </Link>
+      {/* FAQ */}
+      <motion.section
+        className="py-20 px-4"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={fadeUp}
+      >
+        <div className="max-w-2xl mx-auto">
+          <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-center mb-10">
+            Frequently asked questions
+          </h2>
+          <div className="border-t border-white/10">
+            {faqs.map((faq) => (
+              <FAQ key={faq.q} q={faq.q} a={faq.a} />
             ))}
           </div>
-        </section>
-      )}
+        </div>
+      </motion.section>
+
+      {/* CTA */}
+      <section className="py-24 px-4 text-center">
+        <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight">
+          Ready to secure your MCP servers?
+        </h2>
+        <p className="mt-4 text-muted max-w-lg mx-auto leading-relaxed">
+          Start scanning in seconds. No account required.
+        </p>
+        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <Link href="/scan" className="btn-primary">
+            Scan Now — Free
+          </Link>
+          <Link href="/docs" className="btn-secondary">
+            Read the Docs <ArrowRight className="size-4" aria-hidden="true" />
+          </Link>
+        </div>
+      </section>
 
       {/* Footer */}
-      <footer className="py-12 text-center border-t border-[var(--border)]">
-        <p className="text-sm text-[var(--fg-ghost)]">
+      <footer className="py-12 text-center border-t border-white/10">
+        <p className="text-sm text-muted-foreground">
           MCP Scanner — Free and open source
           <span className="mx-2">·</span>
           <a
             href="https://github.com/NOTTIBOY137/mcp-scanner"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[var(--fg-faint)] hover:text-[var(--fg-muted)] transition-colors"
+            className="text-muted hover:text-foreground transition-colors"
           >
             GitHub
           </a>

@@ -3,8 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useAuth, UserButton } from "@clerk/nextjs";
+import { useAuth } from "@clerk/nextjs";
 import { Menu, X } from "lucide-react";
+import { LazyUserButton } from "@/components/LazyClerk";
 
 const links = [
   { href: "/scan", label: "Scan" },
@@ -21,20 +22,18 @@ export function NavBar() {
     pathname === href || pathname.startsWith(href + "/");
 
   return (
-    <header className="sticky top-0 z-50 h-16 border-b border-[var(--border)] bg-[#09090b]/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 h-16 border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-xl">
       <nav
         className="mx-auto flex h-full max-w-5xl items-center justify-between px-6 lg:px-8"
         aria-label="Main"
       >
-        <Link href="/" className="flex items-center gap-2 shrink-0">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
+        <Link href="/" className="flex items-center gap-2.5 shrink-0">
           <img src="/logo-compact.svg" alt="" width={16} height={18} aria-hidden="true" />
-          <span className="text-[15px] font-semibold text-[var(--fg)] tracking-tight">
+          <span className="text-[15px] font-semibold text-foreground tracking-tight">
             MCP Scanner
           </span>
         </Link>
 
-        {/* Desktop */}
         <div className="hidden sm:flex items-center gap-6">
           {links.map((link) => (
             <Link
@@ -42,8 +41,8 @@ export function NavBar() {
               href={link.href}
               className={`text-sm transition-colors ${
                 isActive(link.href)
-                  ? "text-[var(--fg)]"
-                  : "text-[var(--fg-faint)] hover:text-[var(--fg-muted)]"
+                  ? "text-foreground"
+                  : "text-muted-foreground hover:text-muted"
               }`}
             >
               {link.label}
@@ -54,7 +53,7 @@ export function NavBar() {
             href="https://github.com/NOTTIBOY137/mcp-scanner"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[var(--fg-faint)] hover:text-[var(--fg-muted)] transition-colors"
+            className="text-muted-foreground hover:text-muted transition-colors"
             aria-label="GitHub repository"
           >
             <svg className="size-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -63,33 +62,30 @@ export function NavBar() {
           </a>
 
           {isSignedIn ? (
-            <div className="flex items-center gap-4 ml-2 pl-4 border-l border-[var(--border)]">
+            <div className="flex items-center gap-4 ml-2 pl-4 border-l border-white/10">
               <Link
                 href="/dashboard"
                 className={`text-sm transition-colors ${
-                  isActive("/dashboard")
-                    ? "text-[var(--fg)]"
-                    : "text-[var(--fg-faint)] hover:text-[var(--fg-muted)]"
+                  isActive("/dashboard") ? "text-foreground" : "text-muted-foreground hover:text-muted"
                 }`}
               >
                 Dashboard
               </Link>
-              <UserButton />
+              <LazyUserButton />
             </div>
           ) : (
             <Link
               href="/sign-in"
-              className="text-sm text-[var(--fg-faint)] hover:text-[var(--fg-muted)] transition-colors ml-2 pl-4 border-l border-[var(--border)]"
+              className="text-sm text-muted-foreground hover:text-muted transition-colors ml-2 pl-4 border-l border-white/10"
             >
               Sign in
             </Link>
           )}
         </div>
 
-        {/* Mobile */}
         <button
           onClick={() => setOpen(!open)}
-          className="sm:hidden p-2 text-[var(--fg-faint)]"
+          className="sm:hidden p-2 text-muted-foreground"
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
         >
@@ -98,15 +94,13 @@ export function NavBar() {
       </nav>
 
       {open && (
-        <div className="sm:hidden border-t border-[var(--border)] bg-[var(--bg)] px-6 py-4 space-y-3">
+        <div className="sm:hidden border-t border-white/10 bg-background px-6 py-4 space-y-3">
           {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               onClick={() => setOpen(false)}
-              className={`block text-sm ${
-                isActive(link.href) ? "text-[var(--fg)]" : "text-[var(--fg-faint)]"
-              }`}
+              className={`block text-sm ${isActive(link.href) ? "text-foreground" : "text-muted-foreground"}`}
             >
               {link.label}
             </Link>
@@ -114,7 +108,7 @@ export function NavBar() {
           <Link
             href={isSignedIn ? "/dashboard" : "/sign-in"}
             onClick={() => setOpen(false)}
-            className="block text-sm text-[var(--accent)]"
+            className="block text-sm text-brand-400"
           >
             {isSignedIn ? "Dashboard" : "Sign in"}
           </Link>

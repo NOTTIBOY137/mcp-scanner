@@ -8,81 +8,35 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        grade: {
-          "A+": "#10b981",
-          A: "#10b981",
-          B: "#3b82f6",
-          C: "#f59e0b",
-          D: "#f97316",
-          F: "#ef4444",
-        },
-        severity: {
-          critical: "#ef4444",
-          high: "#f97316",
-          medium: "#f59e0b",
-          low: "#06b6d4",
-          info: "#64748b",
-        },
-        noir: {
-          900: "#080b12",
-          800: "#0f1419",
-          700: "#161b22",
-          600: "#1c2333",
+        background: "#0a0a0a",
+        foreground: "#f5f5f5",
+        card: { DEFAULT: "#111111", hover: "#1a1a1a" },
+        border: "rgba(255,255,255,0.1)",
+        muted: { DEFAULT: "#a1a1a1", foreground: "#6b7280" },
+        brand: {
+          50: "#EEF2FF", 100: "#E0E7FF", 200: "#C7D2FE", 300: "#A5B4FC",
+          400: "#818CF8", 500: "#6366F1", 600: "#4F46E5", 700: "#4338CA",
+          800: "#3730A3", 900: "#312E81", 950: "#1E1B4B",
         },
         accent: {
-          DEFAULT: "#06b6d4",
-          glow: "#22d3ee",
-          muted: "#0e7490",
+          50: "#ECFEFF", 100: "#CFFAFE", 200: "#A5F3FC", 300: "#67E8F9",
+          400: "#22D3EE", 500: "#06B6D4", 600: "#0891B2", 700: "#0E7490",
+        },
+        secure: { DEFAULT: "#10B981", dark: "#059669" },
+        critical: { DEFAULT: "#F43F5E", dark: "#E11D48" },
+        warning: { DEFAULT: "#F59E0B", dark: "#D97706" },
+        surface: { DEFAULT: "#0F172A", raised: "#1E293B", overlay: "#334155" },
+        grade: {
+          A: "#10b981", B: "#3b82f6", C: "#f59e0b", D: "#f97316", F: "#ef4444",
         },
       },
       fontFamily: {
-        display: ["var(--font-display)", "system-ui", "sans-serif"],
-        body: ["var(--font-body)", "system-ui", "sans-serif"],
-        mono: ["var(--font-mono)", "monospace"],
+        sans: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
+        mono: ["var(--font-geist-mono)", "monospace"],
       },
-      animation: {
-        "pulse-glow": "pulse-glow 2s ease-in-out infinite",
-        "fade-in": "fade-in 0.5s ease-out forwards",
-        "scan-line": "scan-line 1.5s ease-in-out",
-        "spin-slow": "spin-slow 1.5s linear infinite",
-        float: "float 6s ease-in-out infinite",
-        "gradient-shift": "gradient-shift 8s ease infinite",
-        "glow-pulse": "glow-pulse 2s ease-in-out infinite",
-        "count-up": "count-up 1s ease-out forwards",
-      },
-      keyframes: {
-        "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 8px var(--glow-color)" },
-          "50%": { boxShadow: "0 0 24px var(--glow-color)" },
-        },
-        "fade-in": {
-          from: { opacity: "0", transform: "translateY(8px)" },
-          to: { opacity: "1", transform: "translateY(0)" },
-        },
-        "scan-line": {
-          "0%": { width: "0%" },
-          "100%": { width: "100%" },
-        },
-        "spin-slow": {
-          from: { transform: "rotate(0deg)" },
-          to: { transform: "rotate(360deg)" },
-        },
-        float: {
-          "0%, 100%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-20px)" },
-        },
-        "gradient-shift": {
-          "0%, 100%": { backgroundPosition: "0% 50%" },
-          "50%": { backgroundPosition: "100% 50%" },
-        },
-        "glow-pulse": {
-          "0%, 100%": { opacity: "0.4" },
-          "50%": { opacity: "1" },
-        },
-        "count-up": {
-          from: { opacity: "0", transform: "translateY(10px)" },
-          to: { opacity: "1", transform: "translateY(0)" },
-        },
+      backgroundImage: {
+        "brand-gradient": "linear-gradient(135deg, #6366F1, #0EA5E9)",
+        "scan-gradient": "linear-gradient(135deg, #22D3EE, #6366F1)",
       },
     },
   },
