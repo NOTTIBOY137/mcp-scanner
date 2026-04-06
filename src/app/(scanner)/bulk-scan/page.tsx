@@ -59,6 +59,10 @@ export default function BulkScanPage() {
         </button>
       </div>
 
+      <p className="mt-6 text-center text-xs text-muted-foreground">
+        Rate limited to 30 scans per hour. Results typically complete in 10-30 seconds.
+      </p>
+
       {results && (
         <div className="mt-10 space-y-3">
           <h2 className="text-xl font-semibold text-foreground">Scan Jobs ({results.length})</h2>

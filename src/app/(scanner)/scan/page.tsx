@@ -34,6 +34,17 @@ export default function ScanPage() {
           Results are cached for 1 hour. Only public repositories can be scanned.
         </p>
       </div>
+
+      <div className="mt-12 text-center">
+        <p className="text-sm text-muted-foreground mb-4">Popular servers to try</p>
+        <div className="flex flex-wrap justify-center gap-2">
+          {["modelcontextprotocol/servers", "anthropics/anthropic-cookbook", "firebase/firebase-mcp", "stripe/agent-toolkit", "supabase-community/supabase-mcp"].map((repo) => (
+            <a key={repo} href={`/scan?url=https://github.com/${repo}`} className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-muted hover:bg-white/10 hover:text-foreground transition-colors">
+              {repo}
+            </a>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
