@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { servers, scans } from "@/db/schema";
-import { desc, asc, isNotNull, eq, and, ilike, or } from "drizzle-orm";
-import { Search, Shield, ExternalLink } from "lucide-react";
+import { desc, asc, isNotNull, eq, and, ilike, or, sql } from "drizzle-orm";
+import { Search, Shield } from "lucide-react";
 import Link from "next/link";
 import type { Metadata } from "next";
 
@@ -61,6 +61,9 @@ export default async function LeaderboardPage({
     findingsCount: number | null; lastScannedAt: Date | null;
   }[] = [];
   let dbError = false;
+  let totalServers = 0;
+  let safeCount = 0;
+  let totalFindings = 0;
 
   try {
     let gradeFilter;
@@ -71,6 +74,16 @@ export default async function LeaderboardPage({
     const queryFilter = params.q
       ? or(ilike(servers.name, `%${params.q}%`), ilike(servers.owner, `%${params.q}%`), ilike(servers.repo, `%${params.q}%`))
       : undefined;
+
+    // Aggregate stats
+    const [statsRow] = await db.select({
+      total: sql<number>`count(*)::int`,
+      safe: sql<number>`count(*) filter (where ${servers.latestScore} >= 80)::int`,
+      findings: sql<number>`coalesce(sum(${scans.findingsCount}), 0)::int`,
+    }).from(servers).leftJoin(scans, eq(servers.latestScanId, scans.id)).where(isNotNull(servers.latestGrade));
+    totalServers = statsRow.total;
+    safeCount = statsRow.safe;
+    totalFindings = statsRow.findings;
 
     results = await db
       .select({
@@ -107,6 +120,22 @@ export default async function LeaderboardPage({
         <p className="mt-3 text-muted max-w-lg mx-auto">
           Every scanned MCP server ranked by security score. Find safe servers for your AI agent workflows.
         </p>
+      </div>
+
+      {/* Stats Banner */}
+      <div className="grid grid-cols-3 gap-4 mb-10 max-w-lg mx-auto">
+        <div className="rounded-xl border border-white/10 bg-card p-4 text-center">
+          <p className="text-2xl font-bold font-mono tabular-nums text-foreground">{totalServers}</p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">Servers Scanned</p>
+        </div>
+        <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 text-center">
+          <p className="text-2xl font-bold font-mono tabular-nums text-emerald-400">{safeCount}</p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">Safe</p>
+        </div>
+        <div className="rounded-xl border border-white/10 bg-card p-4 text-center">
+          <p className="text-2xl font-bold font-mono tabular-nums text-foreground">{totalFindings.toLocaleString()}</p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">Findings</p>
+        </div>
       </div>
 
       {/* Search + Filters */}
