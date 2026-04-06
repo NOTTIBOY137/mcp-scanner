@@ -18,7 +18,7 @@ function createRedis(): Redis {
 
 export const scanRateLimit = new Ratelimit({
   redis: createRedis(),
-  limiter: Ratelimit.slidingWindow(5, "1 h"),
+  limiter: Ratelimit.slidingWindow(30, "1 h"),
   prefix: "ratelimit:scan",
 });
 
@@ -28,7 +28,7 @@ export const scanRateLimit = new Ratelimit({
 
 export const apiRateLimit = new Ratelimit({
   redis: createRedis(),
-  limiter: Ratelimit.slidingWindow(60, "1 m"),
+  limiter: Ratelimit.slidingWindow(300, "1 m"),
   prefix: "ratelimit:api",
 });
 
@@ -51,10 +51,10 @@ export function createV1RateLimit(limit: number) {
   return limiter;
 }
 
-// Anonymous v1 rate limit: 10/day per IP
+// Anonymous v1 rate limit: 500/day per IP
 export const anonymousV1RateLimit = new Ratelimit({
   redis: createRedis(),
-  limiter: Ratelimit.slidingWindow(10, "1 d"),
+  limiter: Ratelimit.slidingWindow(500, "1 d"),
   prefix: "ratelimit:v1:anon",
 });
 

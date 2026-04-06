@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { servers, scans } from "@/db/schema";
 import { desc, asc, isNotNull, eq, and, ilike, or } from "drizzle-orm";
-import { Star, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import Link from "next/link";
 import { GRADE_THRESHOLDS, type Grade } from "@/types/grade";
 
@@ -17,22 +17,18 @@ export const metadata: Metadata = {
 
 const FILTERS = [
   { key: "all", label: "All" },
-  { key: "good", label: "A-B" },
-  { key: "risk", label: "C-D" },
+  { key: "good", label: "A\u2013B" },
+  { key: "risk", label: "C\u2013D" },
   { key: "fail", label: "F" },
-  { key: "recent", label: "Recently Scanned" },
 ] as const;
 
-const SORTS = [
-  { key: "best", label: "Best Score" },
-  { key: "worst", label: "Worst Score" },
-  { key: "recent", label: "Most Recent" },
-] as const;
-
-function formatStars(n: number): string {
-  if (n >= 1000) return `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}K`;
-  return n.toLocaleString();
-}
+const GRADE_CSS: Record<string, string> = {
+  A: "bg-[var(--grade-A)]",
+  B: "bg-[var(--grade-B)]",
+  C: "bg-[var(--grade-C)]",
+  D: "bg-[var(--grade-D)]",
+  F: "bg-[var(--grade-F)]",
+};
 
 export default async function LeaderboardPage({
   searchParams,
@@ -93,7 +89,7 @@ export default async function LeaderboardPage({
     let orderBy;
     if (sort === "worst") {
       orderBy = asc(servers.latestScore);
-    } else if (sort === "recent" || filter === "recent") {
+    } else if (sort === "recent") {
       orderBy = desc(servers.updatedAt);
     } else {
       orderBy = desc(servers.latestScore);
@@ -136,33 +132,46 @@ export default async function LeaderboardPage({
   }
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="font-display text-2xl font-bold">Security Leaderboard</h1>
-        <p className="mt-1 text-[var(--text-secondary)]">
-          MCP servers ranked by security score.
-        </p>
+    <div className="py-24 space-y-10">
+      {/* Header row: title left, search right */}
+      <div className="flex items-center justify-between gap-6">
+        <h1 className="text-2xl font-medium text-balance">Leaderboard</h1>
+
+        <form
+          className="relative w-full max-w-[240px]"
+          action="/leaderboard"
+          method="GET"
+        >
+          {filter !== "all" && (
+            <input type="hidden" name="filter" value={filter} />
+          )}
+          {sort !== "best" && (
+            <input type="hidden" name="sort" value={sort} />
+          )}
+          <Search
+            className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[var(--fg-ghost)]"
+            aria-hidden="true"
+          />
+          <input
+            name="q"
+            type="text"
+            placeholder="Search..."
+            defaultValue={params.q}
+            className="input pl-9 w-full"
+          />
+        </form>
       </div>
 
-      {dbError && (
-        <div className="card border-red-500/30 bg-red-500/5 text-center">
-          <p className="font-medium">Failed to load leaderboard data.</p>
-          <p className="mt-1 text-sm text-[var(--text-secondary)]">
-            Database connection timed out. Please refresh the page.
-          </p>
-        </div>
-      )}
-
       {/* Filter tabs */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex items-center gap-6">
         {FILTERS.map((f) => (
           <a
             key={f.key}
             href={buildUrl({ filter: f.key, page: "1" })}
-            className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
+            className={`text-sm transition-colors ${
               filter === f.key
-                ? "bg-[var(--accent)] text-white shadow-md shadow-cyan-500/20"
-                : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]"
+                ? "text-[var(--fg)]"
+                : "text-[var(--fg-faint)] hover:text-[var(--fg-muted)]"
             }`}
           >
             {f.label}
@@ -170,124 +179,82 @@ export default async function LeaderboardPage({
         ))}
       </div>
 
-      {/* Sort + Search */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="flex gap-1 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-tertiary)] p-1">
-          {SORTS.map((s) => (
-            <a
-              key={s.key}
-              href={buildUrl({ sort: s.key, page: "1" })}
-              className={`rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
-                sort === s.key
-                  ? "bg-[var(--bg-hover)] text-[var(--text-primary)]"
-                  : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
-              }`}
-            >
-              {s.label}
-            </a>
-          ))}
+      {dbError && (
+        <div className="card text-center">
+          <p className="font-medium text-[var(--fg)]">
+            Failed to load leaderboard data.
+          </p>
+          <p className="mt-1 text-sm text-[var(--fg-muted)]">
+            Database connection timed out. Please refresh the page.
+          </p>
         </div>
-        <form className="flex flex-1 gap-2" action="/leaderboard" method="GET">
-          {filter !== "all" && (
-            <input type="hidden" name="filter" value={filter} />
-          )}
-          {sort !== "best" && (
-            <input type="hidden" name="sort" value={sort} />
-          )}
-          <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-tertiary)]" />
-            <input
-              name="q"
-              type="text"
-              placeholder="Search servers..."
-              defaultValue={params.q}
-              className="input pl-9"
-            />
-          </div>
-          <button type="submit" className="btn-primary">
-            Search
-          </button>
-        </form>
-      </div>
+      )}
 
       {/* Data Table */}
-      <div className="overflow-x-auto rounded-xl border border-[var(--border-subtle)]">
-        <table className="w-full text-sm">
+      <div className="overflow-x-auto">
+        <table className="data-table w-full text-sm">
           <thead>
-            <tr className="border-b border-[var(--border-subtle)] bg-[var(--bg-secondary)]">
-              <th className="px-4 py-3 text-right font-mono text-xs text-[var(--text-tertiary)] w-12">#</th>
-              <th className="px-4 py-3 text-center w-14">Grade</th>
-              <th className="px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Server</th>
-              <th className="hidden md:table-cell px-4 py-3 text-left font-medium text-[var(--text-secondary)]">Score</th>
-              <th className="hidden sm:table-cell px-4 py-3 text-right font-medium text-[var(--text-secondary)]">Findings</th>
-              <th className="hidden lg:table-cell px-4 py-3 text-right font-medium text-[var(--text-secondary)]">Stars</th>
-              <th className="hidden md:table-cell px-4 py-3 text-right font-medium text-[var(--text-secondary)]">Scanned</th>
+            <tr>
+              <th className="w-12 text-right">#</th>
+              <th className="w-16 text-center">Grade</th>
+              <th className="text-left">Server</th>
+              <th className="hidden md:table-cell text-right">Score</th>
+              <th className="hidden sm:table-cell text-right">Findings</th>
+              <th className="hidden md:table-cell text-right">Scanned</th>
             </tr>
           </thead>
           <tbody>
             {results.map((server, i) => {
               const rank = (page - 1) * pageSize + i + 1;
-              const gradeColor = GRADE_THRESHOLDS[server.latestGrade as Grade]?.color ?? "#64748b";
+              const grade = (server.latestGrade as Grade) ?? null;
+              const bgClass = grade ? GRADE_CSS[grade] ?? "" : "";
+
               return (
                 <tr
                   key={server.id}
-                  className="group border-b border-[var(--border-subtle)] transition-colors hover:bg-[var(--bg-hover)]"
-                  style={{ borderLeft: `2px solid transparent` }}
+                  className="group transition-colors hover:bg-[var(--bg-hover)]"
+                  style={{ height: 52 }}
                 >
-                  <td className="px-4 py-3 text-right font-mono text-[var(--text-tertiary)]">
+                  <td
+                    className="text-right text-[var(--fg-ghost)]"
+                    style={{ fontFamily: "'Geist Mono', monospace" }}
+                  >
                     {rank}
                   </td>
-                  <td className="px-4 py-3 text-center">
-                    <div
-                      className="mx-auto flex h-8 w-8 items-center justify-center rounded-full font-mono font-bold text-sm"
-                      style={{ backgroundColor: `${gradeColor}15`, color: gradeColor }}
+                  <td className="text-center">
+                    <span
+                      className={`inline-flex items-center justify-center size-6 rounded-full text-xs font-semibold text-white ${bgClass}`}
                     >
-                      {server.latestGrade ?? "?"}
-                    </div>
+                      {grade ?? "?"}
+                    </span>
                   </td>
-                  <td className="px-4 py-3">
+                  <td>
                     <Link
                       href={`/server/${server.id}`}
-                      className="group-hover:text-[var(--accent-glow)] font-medium transition-colors"
+                      className="text-[var(--fg)] hover:text-[var(--accent-hover)] transition-colors"
                     >
-                      {server.name}
-                    </Link>
-                    <p className="text-xs text-[var(--text-tertiary)]">
                       {server.owner}/{server.repo}
-                    </p>
+                    </Link>
                   </td>
-                  <td className="hidden md:table-cell px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-[var(--text-primary)]">
-                        {server.latestScore ?? "—"}/100
-                      </span>
-                      {server.latestScore !== null && (
-                        <div className="h-1.5 w-16 overflow-hidden rounded-full bg-[var(--bg-primary)]">
-                          <div
-                            className="h-full rounded-full"
-                            style={{ width: `${server.latestScore}%`, backgroundColor: gradeColor }}
-                          />
-                        </div>
-                      )}
-                    </div>
+                  <td
+                    className="hidden md:table-cell text-right text-[var(--fg)]"
+                    style={{ fontFamily: "'Geist Mono', monospace" }}
+                  >
+                    {server.latestScore ?? "\u2014"}
                   </td>
-                  <td className="hidden sm:table-cell px-4 py-3 text-right text-[var(--text-secondary)]">
+                  <td
+                    className="hidden sm:table-cell text-right text-[var(--fg-muted)]"
+                    style={{ fontFamily: "'Geist Mono', monospace" }}
+                  >
                     {server.findingsCount ?? 0}
                   </td>
-                  <td className="hidden lg:table-cell px-4 py-3 text-right text-[var(--text-tertiary)]">
-                    {(server.stars ?? 0) > 0 ? (
-                      <span className="inline-flex items-center gap-1">
-                        <Star className="h-3 w-3" />
-                        {formatStars(server.stars!)}
-                      </span>
-                    ) : (
-                      "—"
-                    )}
-                  </td>
-                  <td className="hidden md:table-cell px-4 py-3 text-right text-[var(--text-tertiary)]">
+                  <td className="hidden md:table-cell text-right text-[var(--fg-faint)]">
                     {server.lastScannedAt
-                      ? new Date(server.lastScannedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })
-                      : "—"}
+                      ? new Date(server.lastScannedAt).toLocaleDateString(
+                          "en-US",
+                          { month: "short", day: "numeric" }
+                        )
+                      : "\u2014"}
                   </td>
                 </tr>
               );
@@ -297,12 +264,12 @@ export default async function LeaderboardPage({
       </div>
 
       {results.length === 0 && !dbError && (
-        <div className="card text-center py-12">
-          <p className="text-[var(--text-secondary)]">No servers found.</p>
+        <div className="text-center py-16">
+          <p className="text-[var(--fg-muted)]">No servers found.</p>
           {params.q && (
             <a
               href="/leaderboard"
-              className="mt-2 inline-block text-sm text-[var(--accent)] hover:text-[var(--accent-glow)]"
+              className="mt-2 inline-block text-sm text-[var(--accent)] hover:text-[var(--accent-hover)]"
             >
               Clear search
             </a>
@@ -312,34 +279,33 @@ export default async function LeaderboardPage({
 
       {/* Pagination */}
       {(results.length === pageSize || page > 1) && (
-        <div className="flex items-center justify-center gap-4">
-          {page > 1 && (
-            <a href={buildUrl({ page: String(page - 1) })} className="btn-secondary">
-              &larr; Previous
+        <div className="flex items-center justify-center gap-6 pt-4">
+          {page > 1 ? (
+            <a
+              href={buildUrl({ page: String(page - 1) })}
+              className="text-sm text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
+            >
+              Previous
             </a>
+          ) : (
+            <span className="text-sm text-[var(--fg-ghost)]">Previous</span>
           )}
-          <span className="text-sm text-[var(--text-tertiary)]">
-            Page {page}
-          </span>
-          {results.length === pageSize && (
-            <a href={buildUrl({ page: String(page + 1) })} className="btn-secondary">
-              Next &rarr;
-            </a>
-          )}
-        </div>
-      )}
-
-      {results.length > 0 && results.length < pageSize && page === 1 && (
-        <div className="card text-center border-dashed">
-          <p className="text-[var(--text-secondary)]">
-            Know an MCP server we should scan?
-          </p>
-          <Link
-            href="/scan"
-            className="mt-2 inline-block text-sm font-medium text-[var(--accent)] hover:text-[var(--accent-glow)]"
+          <span
+            className="text-sm text-[var(--fg-ghost)]"
+            style={{ fontFamily: "'Geist Mono', monospace" }}
           >
-            Submit it for scanning &rarr;
-          </Link>
+            {page}
+          </span>
+          {results.length === pageSize ? (
+            <a
+              href={buildUrl({ page: String(page + 1) })}
+              className="text-sm text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
+            >
+              Next
+            </a>
+          ) : (
+            <span className="text-sm text-[var(--fg-ghost)]">Next</span>
+          )}
         </div>
       )}
     </div>

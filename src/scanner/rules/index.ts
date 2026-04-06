@@ -9,6 +9,11 @@ import { missingAuthRules } from "./missing-auth";
 import { supplyChainRules } from "./supply-chain";
 import { rugPullRules } from "./rug-pull";
 import { dataExfiltrationRules } from "./data-exfiltration";
+import { insecureCommunicationRules } from "./insecure-communication";
+import { excessiveDataExposureRules } from "./excessive-data-exposure";
+import { loggingDeficiencyRules } from "./logging-deficiency";
+import { runtimeToolPoisoningRules } from "./runtime-tool-poisoning";
+import { shadowMcpServerRules } from "./shadow-mcp-server";
 
 export const allRules: ScanRule[] = [
   ...toolPoisoningRules,
@@ -21,6 +26,11 @@ export const allRules: ScanRule[] = [
   ...supplyChainRules,
   ...rugPullRules,
   ...dataExfiltrationRules,
+  ...insecureCommunicationRules,
+  ...excessiveDataExposureRules,
+  ...loggingDeficiencyRules,
+  ...runtimeToolPoisoningRules,
+  ...shadowMcpServerRules,
 ];
 
 export {
@@ -34,4 +44,9 @@ export {
   supplyChainRules,
   rugPullRules,
   dataExfiltrationRules,
+  insecureCommunicationRules,
+  excessiveDataExposureRules,
+  loggingDeficiencyRules,
+  runtimeToolPoisoningRules,
+  shadowMcpServerRules,
 };

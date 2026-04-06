@@ -9,6 +9,7 @@ export type {
   ScanResult,
   CategoryScore,
   ScanResponse,
+  OWASPComplianceSummary,
 } from "@/types/scan";
 
 export type {

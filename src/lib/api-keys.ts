@@ -44,14 +44,7 @@ export async function validateApiKey(
 
 export type PlanLimits = { daily: number; maxClaims: number };
 
-export function getPlanLimits(plan: string): PlanLimits {
-  switch (plan) {
-    case "team":
-      return { daily: 10_000, maxClaims: 100 };
-    case "pro":
-      return { daily: 1_000, maxClaims: 10 };
-    case "free":
-    default:
-      return { daily: 100, maxClaims: 1 };
-  }
+export function getPlanLimits(_plan?: string): PlanLimits {
+  // All features are free — everyone gets top-tier limits
+  return { daily: 10_000, maxClaims: 100 };
 }

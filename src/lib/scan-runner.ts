@@ -100,6 +100,8 @@ export async function runScanInBackground(params: {
           lineNumber: m.lineNumber,
           snippet: m.snippet.slice(0, 500),
           confidence: m.confidence,
+          owaspMcpTop10: m.owaspMcpTop10,
+          cweIds: m.cweIds,
         }))
       );
     }
@@ -130,6 +132,8 @@ export async function runScanInBackground(params: {
         filesScanned: fileContents.length,
         findingsCount: matches.length,
         categoryScores: gradeResult.categoryScores,
+        owaspCompliance: gradeResult.owaspCompliance,
+        compliancePercentage: gradeResult.compliancePercentage,
         duration,
         completedAt: new Date(),
       })
@@ -156,6 +160,8 @@ export async function runScanInBackground(params: {
       findingsCount: matches.length,
       categoryScores: gradeResult.categoryScores,
       findings: matches,
+      owaspCompliance: gradeResult.owaspCompliance,
+      compliancePercentage: gradeResult.compliancePercentage,
     }).catch((err) => log.error("Failed to cache scan result", { error: String(err) }));
 
     // Deliver webhooks

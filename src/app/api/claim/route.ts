@@ -2,9 +2,8 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { createId } from "@paralleldrive/cuid2";
 import { db } from "@/lib/db";
-import { serverClaims, servers, apiKeys } from "@/db/schema";
+import { serverClaims, servers } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
-import { getPlanLimits } from "@/lib/api-keys";
 
 export async function POST(request: Request) {
   const { userId } = await auth();
@@ -42,15 +41,7 @@ export async function POST(request: Request) {
     );
   }
 
-  // Enforce per-plan claim limits
-  const userKey = await db
-    .select()
-    .from(apiKeys)
-    .where(eq(apiKeys.clerkUserId, userId))
-    .limit(1);
-  const plan = userKey.length > 0 ? (userKey[0].plan ?? "free") : "free";
-  const limits = getPlanLimits(plan);
-
+  // Enforce generous claim limit (100 per user — all features free)
   const verifiedClaims = await db
     .select()
     .from(serverClaims)
@@ -61,11 +52,9 @@ export async function POST(request: Request) {
       )
     );
 
-  if (verifiedClaims.length >= limits.maxClaims) {
+  if (verifiedClaims.length >= 100) {
     return NextResponse.json(
-      {
-        error: `Claim limit reached. Your ${plan} plan allows ${limits.maxClaims} verified claim(s). Upgrade to claim more servers.`,
-      },
+      { error: "Claim limit reached (100 servers max)." },
       { status: 403 }
     );
   }

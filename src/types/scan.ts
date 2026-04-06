@@ -14,7 +14,12 @@ export type VulnCategory =
   | "missing-auth"
   | "supply-chain"
   | "rug-pull"
-  | "data-exfiltration";
+  | "data-exfiltration"
+  | "insecure-communication"
+  | "excessive-data-exposure"
+  | "logging-deficiency"
+  | "runtime-tool-poisoning"
+  | "shadow-mcp-server";
 
 export interface ScanRule {
   id: string;
@@ -27,6 +32,10 @@ export interface ScanRule {
   validator?: (match: RegExpMatchArray, fileContent: string) => boolean;
   severityAdjuster?: (match: RegExpMatchArray, fileContent: string) => Severity;
   remediation?: string;
+  owaspMcpTop10?: string;
+  cweIds?: string[];
+  mitreAtlasIds?: string[];
+  remediationCode?: string;
 }
 
 export interface RuleMatch {
@@ -40,6 +49,10 @@ export interface RuleMatch {
   snippet: string;
   confidence: Confidence;
   remediation?: string;
+  owaspMcpTop10?: string;
+  cweIds?: string[];
+  mitreAtlasIds?: string[];
+  remediationCode?: string;
 }
 
 export interface FileContent {
@@ -61,6 +74,14 @@ export interface CategoryScore {
   penalty: number;
 }
 
+export interface OWASPComplianceSummary {
+  id: string;
+  title: string;
+  findingsCount: number;
+  maxSeverity: Severity | null;
+  compliant: boolean;
+}
+
 export interface ScanResponse {
   id: string;
   status: ScanStatus;
@@ -70,5 +91,7 @@ export interface ScanResponse {
   findingsCount?: number;
   categoryScores?: CategoryScore[];
   findings?: RuleMatch[];
+  owaspCompliance?: OWASPComplianceSummary[];
+  compliancePercentage?: number;
   error?: string;
 }

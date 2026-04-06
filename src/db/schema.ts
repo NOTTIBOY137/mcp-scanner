@@ -49,6 +49,8 @@ export const scans = pgTable(
     filesScanned: integer("files_scanned").default(0),
     findingsCount: integer("findings_count").default(0),
     categoryScores: jsonb("category_scores"),
+    owaspCompliance: jsonb("owasp_compliance"),
+    compliancePercentage: integer("compliance_percentage"),
     commitSha: text("commit_sha"),
     branch: text("branch").default("main"),
     duration: integer("duration"),
@@ -78,6 +80,8 @@ export const findings = pgTable(
     lineNumber: integer("line_number"),
     snippet: text("snippet"),
     confidence: varchar("confidence", { length: 10 }).notNull().default("high"),
+    owaspMcpTop10: varchar("owasp_mcp_top10", { length: 10 }),
+    cweIds: jsonb("cwe_ids"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [

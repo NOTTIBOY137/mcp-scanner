@@ -1,6 +1,7 @@
 import type { RuleMatch, VulnCategory } from "@/types/scan";
 import type { GradeResult, CategoryScoreDetail } from "@/types/grade";
 import { scoreToGrade } from "@/types/grade";
+import { computeOwaspCompliance } from "@/scanner/owasp-mapping";
 
 const SEVERITY_PENALTIES: Record<string, number> = {
   critical: 15,
@@ -27,9 +28,14 @@ const ALL_CATEGORIES: VulnCategory[] = [
   "supply-chain",
   "rug-pull",
   "data-exfiltration",
+  "insecure-communication",
+  "excessive-data-exposure",
+  "logging-deficiency",
+  "runtime-tool-poisoning",
+  "shadow-mcp-server",
 ];
 
-const MAX_SCORE_PER_CATEGORY = 12.5;
+const MAX_SCORE_PER_CATEGORY = 8;
 
 export function calculateGrade(matches: RuleMatch[]): GradeResult {
   let score = 100;
@@ -71,7 +77,9 @@ export function calculateGrade(matches: RuleMatch[]): GradeResult {
     (m) => m.severity === "high" && m.confidence !== "low"
   ).length;
   const hasToolPoisoning = matches.some(
-    (m) => m.category === "tool-poisoning" && m.confidence !== "low"
+    (m) =>
+      (m.category === "tool-poisoning" || m.category === "runtime-tool-poisoning") &&
+      m.confidence !== "low"
   );
 
   if (hasToolPoisoning) {
@@ -108,10 +116,15 @@ export function calculateGrade(matches: RuleMatch[]): GradeResult {
     }
   );
 
+  // Compute OWASP MCP Top 10 compliance
+  const { compliance, percentage } = computeOwaspCompliance(matches);
+
   return {
     grade: scoreToGrade(score),
     score,
     categoryScores,
     cappedBy,
+    owaspCompliance: compliance,
+    compliancePercentage: percentage,
   };
 }

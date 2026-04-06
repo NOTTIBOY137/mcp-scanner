@@ -6,7 +6,7 @@ import crypto from "crypto";
 import { db } from "@/lib/db";
 import { webhooks } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { getUserSubscription, getEffectivePlan } from "@/lib/subscriptions";
+// Payment gates removed — all features free for everyone
 
 function isPrivateUrl(urlString: string): boolean {
   try {
@@ -54,15 +54,6 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const subscription = await getUserSubscription(userId);
-  const plan = getEffectivePlan(subscription);
-  if (plan === "free") {
-    return NextResponse.json(
-      { error: "Webhooks require a Pro or Team plan." },
-      { status: 403 }
-    );
-  }
-
   const userWebhooks = await db
     .select()
     .from(webhooks)
@@ -77,15 +68,6 @@ export async function POST(request: Request) {
   const { userId } = await auth();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const subscription = await getUserSubscription(userId);
-  const plan = getEffectivePlan(subscription);
-  if (plan === "free") {
-    return NextResponse.json(
-      { error: "Webhooks require a Pro or Team plan." },
-      { status: 403 }
-    );
   }
 
   const body = await request.json().catch(() => null);

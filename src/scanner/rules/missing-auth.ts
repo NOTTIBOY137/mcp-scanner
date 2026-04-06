@@ -52,4 +52,60 @@ export const missingAuthRules: ScanRule[] = [
       /(?:req\.body|req\.params|req\.query)\s*\.\w+\s*(?:[^;]*(?:exec|query|sql|eval|spawn|readFile))/g,
     remediation: "Add input validation using a schema library (e.g., Zod, Joi) to all endpoint handlers.",
   },
+  {
+    id: "MA005",
+    category: "missing-auth",
+    title: "Missing rate limiting on endpoint",
+    description: "API endpoints without rate limiting are vulnerable to brute force and denial of service.",
+    severity: "medium",
+    pattern: /(?:app|router)\.(?:get|post|put|delete|patch)\s*\(\s*["']/g,
+    validator: (match: RegExpMatchArray, fileContent: string) => {
+      return !(/rateLimit|rateLimiter|throttle|slowDown|express-rate-limit/i.test(fileContent));
+    },
+    remediation: "Add rate limiting middleware to all public API endpoints.",
+    owaspMcpTop10: "MCP07",
+    cweIds: ["CWE-770"],
+  },
+  {
+    id: "MA006",
+    category: "missing-auth",
+    title: "No CSRF protection on state-changing endpoint",
+    description: "POST/PUT/DELETE endpoints without CSRF tokens are vulnerable to cross-site request forgery.",
+    severity: "medium",
+    pattern: /(?:app|router)\.(?:post|put|delete|patch)\s*\(\s*["']/g,
+    validator: (match: RegExpMatchArray, fileContent: string) => {
+      return !(/csrf|xsrf|csrfToken|_csrf|csurf/i.test(fileContent));
+    },
+    remediation: "Implement CSRF protection using tokens or SameSite cookies.",
+    owaspMcpTop10: "MCP07",
+    cweIds: ["CWE-352"],
+  },
+  {
+    id: "MA007",
+    category: "missing-auth",
+    title: "Open WebSocket without authentication",
+    description: "WebSocket connections without authentication allow unauthorized access.",
+    severity: "high",
+    pattern: /new\s+(?:WebSocket\.Server|WebSocketServer|Server)\s*\(\s*\{[^}]*\}\s*\)/g,
+    validator: (match: RegExpMatchArray, fileContent: string) => {
+      return !(/verifyClient|authenticate|auth|token|session/i.test(fileContent));
+    },
+    remediation: "Implement authentication in the WebSocket verifyClient callback.",
+    owaspMcpTop10: "MCP07",
+    cweIds: ["CWE-306"],
+  },
+  {
+    id: "MA008",
+    category: "missing-auth",
+    title: "Missing OAuth scope validation",
+    description: "OAuth-protected endpoints that don't validate scopes may allow unauthorized actions.",
+    severity: "medium",
+    pattern: /(?:oauth|bearer|accessToken|access_token)\b/gi,
+    validator: (match: RegExpMatchArray, fileContent: string) => {
+      return (/oauth|bearer|accessToken/i.test(fileContent)) && !(/scope|scopes|hasScope|checkScope|requiredScope/i.test(fileContent));
+    },
+    remediation: "Validate OAuth scopes on every endpoint. Check that the token has required permissions.",
+    owaspMcpTop10: "MCP07",
+    cweIds: ["CWE-862"],
+  },
 ];

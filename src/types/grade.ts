@@ -1,3 +1,5 @@
+import type { OWASPComplianceSummary } from "./scan";
+
 export type Grade = "A" | "B" | "C" | "D" | "F";
 
 export interface GradeResult {
@@ -5,6 +7,8 @@ export interface GradeResult {
   score: number;
   categoryScores: CategoryScoreDetail[];
   cappedBy?: string;
+  owaspCompliance?: OWASPComplianceSummary[];
+  compliancePercentage?: number;
 }
 
 export interface CategoryScoreDetail {

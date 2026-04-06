@@ -1,43 +1,20 @@
 import Link from "next/link";
-import { ShieldAlert, Bug, ShieldCheck } from "lucide-react";
+import { Code2, Shield, GitBranch, ArrowRight } from "lucide-react";
 import { db } from "@/lib/db";
 import { servers, scans } from "@/db/schema";
 import { sql, isNotNull, desc, eq } from "drizzle-orm";
-import { ServerCard } from "@/components/scanner/ServerCard";
 import { HomeSearchBar } from "@/components/scanner/HomeSearchBar";
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "MCP Scanner — Is Your MCP Server Safe?",
-  description:
-    "The first public security registry for Model Context Protocol servers. Scan any MCP server for vulnerabilities in seconds. Free security grades, badges, and shareable reports.",
-  openGraph: {
-    title: "MCP Scanner — Is Your MCP Server Safe?",
-    description:
-      "The first public security registry for Model Context Protocol servers.",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "MCP Scanner — Is Your MCP Server Safe?",
-    description:
-      "Free security grades for MCP servers. Scan any server in seconds.",
-  },
-};
 
 export const revalidate = 300;
 
 export default async function HomePage() {
   let totalServers = 0;
   let totalFindings = 0;
-  let avgScore = 0;
   let recentServers: {
     id: string;
     name: string;
     owner: string;
     repo: string;
-    description: string | null;
-    stars: number | null;
     latestGrade: string | null;
     latestScore: number | null;
     findingsCount: number | null;
@@ -45,27 +22,17 @@ export default async function HomePage() {
   }[] = [];
 
   try {
-    const [serverCount] = await db
+    const [sc] = await db
       .select({ count: sql<number>`count(*)::int` })
       .from(servers)
       .where(isNotNull(servers.latestGrade));
-    totalServers = serverCount.count;
+    totalServers = sc.count;
 
-    const [findingsSum] = await db
-      .select({
-        total: sql<number>`coalesce(sum(${scans.findingsCount}), 0)::int`,
-      })
+    const [fs] = await db
+      .select({ total: sql<number>`coalesce(sum(${scans.findingsCount}), 0)::int` })
       .from(scans)
       .where(eq(scans.status, "completed"));
-    totalFindings = findingsSum.total;
-
-    const [scoreAvg] = await db
-      .select({
-        avg: sql<number>`coalesce(round(avg(${servers.latestScore})), 0)::int`,
-      })
-      .from(servers)
-      .where(isNotNull(servers.latestScore));
-    avgScore = scoreAvg.avg;
+    totalFindings = fs.total;
 
     recentServers = await db
       .select({
@@ -73,8 +40,6 @@ export default async function HomePage() {
         name: servers.name,
         owner: servers.owner,
         repo: servers.repo,
-        description: servers.description,
-        stars: servers.stars,
         latestGrade: servers.latestGrade,
         latestScore: servers.latestScore,
         findingsCount: scans.findingsCount,
@@ -84,142 +49,188 @@ export default async function HomePage() {
       .leftJoin(scans, eq(servers.latestScanId, scans.id))
       .where(isNotNull(servers.latestGrade))
       .orderBy(desc(servers.updatedAt))
-      .limit(6);
+      .limit(5);
   } catch {
-    // DB connection may fail — render with defaults
+    /* render with defaults */
   }
 
+  const gradeColor: Record<string, string> = {
+    A: "bg-emerald-500",
+    B: "bg-blue-500",
+    C: "bg-amber-500",
+    D: "bg-orange-500",
+    F: "bg-red-500",
+  };
+
   return (
-    <div className="space-y-0">
+    <>
       {/* Hero */}
-      <section className="gradient-mesh grain relative -mx-6 -mt-8 flex min-h-[70vh] flex-col items-center justify-center px-6 py-20 text-center overflow-hidden">
-        {/* Floating particles */}
-        {Array.from({ length: 8 }, (_, i) => (
-          <div
-            key={i}
-            className="particle"
-            style={{
-              left: `${10 + i * 11}%`,
-              top: `${15 + (i * 17) % 60}%`,
-              animationDelay: `${i * 0.7}s`,
-              animationDuration: `${5 + (i % 3) * 2}s`,
-            }}
-          />
-        ))}
+      <section className="relative pt-32 pb-24 text-center">
+        <div className="absolute inset-0 dot-grid opacity-50" aria-hidden="true" />
+        <div className="relative">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-medium tracking-tight text-balance">
+            Secure your MCP servers
+          </h1>
+          <p className="mt-4 text-lg text-[var(--fg-faint)] max-w-xl mx-auto text-pretty">
+            Free security scanning for Model Context Protocol servers.
+            122 rules. OWASP mapped. CI/CD ready.
+          </p>
+          <div className="mt-10 max-w-lg mx-auto">
+            <HomeSearchBar />
+          </div>
+          <p className="mt-4 text-sm text-[var(--fg-ghost)]">
+            Try:{" "}
+            <Link
+              href="/scan?q=modelcontextprotocol/servers"
+              className="text-[var(--accent)] hover:underline"
+            >
+              modelcontextprotocol/servers
+            </Link>
+          </p>
+        </div>
+      </section>
 
-        <h1 className="font-display text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl leading-[1.1]">
-          Is Your MCP Server
-          <br />
-          <span className="text-[var(--accent-glow)] glow-text">Safe?</span>
-        </h1>
-        <p className="mx-auto mt-6 max-w-[540px] text-lg leading-relaxed text-[var(--text-secondary)]">
-          The first public security registry for Model Context Protocol
-          servers. Scan any MCP server in seconds.
+      {/* Stats — single line */}
+      <section
+        className="py-6 text-center text-sm text-[var(--fg-faint)] border-y border-[var(--border)]"
+        aria-label="Statistics"
+      >
+        <p>
+          <span className="text-[var(--fg)] font-medium" style={{ fontFamily: "'Geist Mono', monospace" }}>
+            {totalServers}
+          </span>{" "}
+          servers scanned{" · "}
+          <span className="text-[var(--fg)] font-medium" style={{ fontFamily: "'Geist Mono', monospace" }}>
+            {totalFindings.toLocaleString()}
+          </span>{" "}
+          vulnerabilities found{" · "}
+          <span className="text-[var(--fg)] font-medium" style={{ fontFamily: "'Geist Mono', monospace" }}>
+            122
+          </span>{" "}
+          detection rules
         </p>
-        <div className="mt-10 w-full">
-          <HomeSearchBar />
+      </section>
+
+      {/* Features — 3 cards */}
+      <section className="py-24">
+        <div className="grid gap-6 md:grid-cols-3">
+          {[
+            {
+              icon: Code2,
+              title: "Source Code Analysis",
+              desc: "Scan GitHub repos for 15 categories of vulnerabilities including tool poisoning, injection, and credential theft.",
+              href: "/scan",
+            },
+            {
+              icon: Shield,
+              title: "Config Scanner",
+              desc: "Paste your MCP config to find hardcoded secrets, dangerous permissions, and insecure server settings.",
+              href: "/config-scan",
+            },
+            {
+              icon: GitBranch,
+              title: "CI/CD Integration",
+              desc: "GitHub Actions workflow that blocks unsafe MCP servers in every pull request.",
+              href: "/integrations",
+            },
+          ].map(({ icon: Icon, title, desc, href }) => (
+            <div key={title} className="card group">
+              <Icon className="size-6 text-[var(--fg-ghost)] mb-4" aria-hidden="true" />
+              <h3 className="text-base font-medium">{title}</h3>
+              <p className="mt-2 text-sm text-[var(--fg-faint)] text-pretty leading-relaxed">
+                {desc}
+              </p>
+              <Link
+                href={href}
+                className="mt-4 inline-flex items-center gap-1 text-sm text-[var(--accent)] hover:underline"
+              >
+                Learn more <ArrowRight className="size-3.5" aria-hidden="true" />
+              </Link>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* Stats Bar */}
-      <section className="relative -mx-6 border-y border-[var(--border-subtle)] bg-[var(--bg-secondary)] px-6 py-10">
-        <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-10 sm:gap-20 text-center">
-          <div>
-            <p className="font-mono text-3xl font-bold text-[var(--text-primary)]">
-              {totalServers.toLocaleString()}
-            </p>
-            <p className="mt-1 text-xs font-medium uppercase tracking-widest text-[var(--text-tertiary)]">
-              Servers Scanned
-            </p>
-          </div>
-          <div className="hidden sm:block h-10 w-px bg-[var(--border-subtle)]" />
-          <div>
-            <p className="font-mono text-3xl font-bold text-[var(--text-primary)]">
-              {totalFindings.toLocaleString()}
-            </p>
-            <p className="mt-1 text-xs font-medium uppercase tracking-widest text-[var(--text-tertiary)]">
-              Vulnerabilities Found
-            </p>
-          </div>
-          <div className="hidden sm:block h-10 w-px bg-[var(--border-subtle)]" />
-          <div>
-            <p className="font-mono text-3xl font-bold text-[var(--text-primary)]">
-              {avgScore}
-            </p>
-            <p className="mt-1 text-xs font-medium uppercase tracking-widest text-[var(--text-tertiary)]">
-              Average Score
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Recently Scanned */}
+      {/* Recently Scanned — compact list */}
       {recentServers.length > 0 && (
-        <section className="pt-16">
+        <section className="pb-24">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="font-display text-xl font-bold">Recently Scanned</h2>
+            <h2 className="text-lg font-medium">Recently scanned</h2>
             <Link
               href="/leaderboard"
-              className="text-sm text-[var(--accent)] hover:text-[var(--accent-glow)] transition-colors"
+              className="text-sm text-[var(--fg-faint)] hover:text-[var(--fg-muted)] transition-colors"
             >
-              View all &rarr;
+              View all <ArrowRight className="inline size-3.5" aria-hidden="true" />
             </Link>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {recentServers.map((server) => (
-              <ServerCard key={server.id} server={server} />
+          <div className="border border-[var(--border)] rounded-xl overflow-hidden">
+            {recentServers.map((server, i) => (
+              <Link
+                key={server.id}
+                href={`/server/${server.id}`}
+                className={`flex items-center gap-4 px-4 py-3.5 hover:bg-[var(--bg-muted)] transition-colors ${
+                  i < recentServers.length - 1 ? "border-b border-[var(--border)]" : ""
+                }`}
+              >
+                {/* Grade badge */}
+                <div
+                  className={`size-7 rounded-full flex items-center justify-center text-xs font-semibold text-white shrink-0 ${
+                    gradeColor[server.latestGrade ?? "F"] ?? "bg-zinc-600"
+                  }`}
+                >
+                  {server.latestGrade ?? "–"}
+                </div>
+
+                {/* Server info */}
+                <div className="flex-1 min-w-0">
+                  <span className="text-sm text-[var(--fg)]">
+                    {server.owner}/{server.repo}
+                  </span>
+                </div>
+
+                {/* Score */}
+                <span
+                  className="text-sm text-[var(--fg-faint)] tabular-nums"
+                  style={{ fontFamily: "'Geist Mono', monospace" }}
+                >
+                  {server.latestScore ?? "–"}/100
+                </span>
+
+                {/* Findings */}
+                <span className="text-sm text-[var(--fg-ghost)] tabular-nums w-20 text-right">
+                  {server.findingsCount ?? 0} findings
+                </span>
+
+                {/* Time */}
+                <span className="text-xs text-[var(--fg-ghost)] w-16 text-right hidden sm:block">
+                  {server.lastScannedAt
+                    ? new Date(server.lastScannedAt).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                      })
+                    : "–"}
+                </span>
+              </Link>
             ))}
           </div>
         </section>
       )}
 
-      {/* Why Scan? */}
-      <section className="pt-20">
-        <h2 className="font-display text-2xl font-bold text-center mb-10">
-          Why Scan MCP Servers?
-        </h2>
-        <div className="grid gap-6 md:grid-cols-3">
-          <div className="card group">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--accent)]/10">
-              <ShieldAlert className="h-6 w-6 text-[var(--accent)]" />
-            </div>
-            <h3 className="font-display font-semibold text-[var(--text-primary)]">
-              75% allow arbitrary file access
-            </h3>
-            <p className="mt-2 text-sm text-[var(--text-secondary)]">
-              Most MCP servers grant unrestricted read/write access to your
-              filesystem without proper sandboxing.
-            </p>
-          </div>
-          <div className="card group">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--accent)]/10">
-              <Bug className="h-6 w-6 text-[var(--accent)]" />
-            </div>
-            <h3 className="font-display font-semibold text-[var(--text-primary)]">
-              53% have command injection
-            </h3>
-            <p className="mt-2 text-sm text-[var(--text-secondary)]">
-              Over half of scanned servers pass unsanitized input to system
-              shell commands, enabling remote code execution.
-            </p>
-          </div>
-          <div className="card group">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--accent)]/10">
-              <ShieldCheck className="h-6 w-6 text-[var(--accent)]" />
-            </div>
-            <h3 className="font-display font-semibold text-[var(--text-primary)]">
-              No registry existed — until now
-            </h3>
-            <p className="mt-2 text-sm text-[var(--text-secondary)]">
-              MCP Scanner is the first public trust registry. Know what you
-              are installing before it gets access to your data.
-            </p>
-          </div>
-        </div>
-        <p className="mt-6 text-center text-xs text-[var(--text-tertiary)]">
-          Based on analysis of publicly scanned MCP servers on this registry.
+      {/* Footer */}
+      <footer className="py-12 text-center border-t border-[var(--border)]">
+        <p className="text-sm text-[var(--fg-ghost)]">
+          MCP Scanner — Free and open source
+          <span className="mx-2">·</span>
+          <a
+            href="https://github.com/NOTTIBOY137/mcp-scanner"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[var(--fg-faint)] hover:text-[var(--fg-muted)] transition-colors"
+          >
+            GitHub
+          </a>
         </p>
-      </section>
-    </div>
+      </footer>
+    </>
   );
 }

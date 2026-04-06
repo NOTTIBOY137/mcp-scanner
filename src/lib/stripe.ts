@@ -1,24 +1,11 @@
-import Stripe from "stripe";
+// Stripe has been removed — all features are now free.
 
-let _stripe: Stripe | null = null;
-
-export function getStripe(): Stripe {
-  if (!_stripe) {
-    const key = process.env.STRIPE_SECRET_KEY;
-    if (!key) throw new Error("STRIPE_SECRET_KEY is not set");
-    _stripe = new Stripe(key, { apiVersion: "2026-02-25.clover" });
-  }
-  return _stripe;
+export function getStripe(): never {
+  throw new Error("Stripe is disabled. All features are free.");
 }
 
-export const PLAN_PRICE_MAP: Record<string, string> = {
-  pro: process.env.STRIPE_PRO_PRICE_ID ?? "",
-  team: process.env.STRIPE_TEAM_PRICE_ID ?? "",
-};
+export const PLAN_PRICE_MAP: Record<string, string> = {};
 
-export function priceToPlan(priceId: string): string {
-  for (const [plan, id] of Object.entries(PLAN_PRICE_MAP)) {
-    if (id === priceId) return plan;
-  }
-  return "free";
+export function priceToPlan(_priceId: string): string {
+  return "team";
 }

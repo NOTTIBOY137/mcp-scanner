@@ -31,20 +31,16 @@ const FREE_DEFAULT: Subscription = {
 export async function getUserSubscription(
   clerkUserId: string
 ): Promise<Subscription> {
-  const rows = await db
-    .select()
-    .from(subscriptions)
-    .where(eq(subscriptions.clerkUserId, clerkUserId));
-
-  if (rows.length === 0) {
-    return { ...FREE_DEFAULT, clerkUserId };
-  }
-  return rows[0] as Subscription;
+  // All features are free — skip DB query, return team-tier for everyone
+  return {
+    ...FREE_DEFAULT,
+    clerkUserId,
+    plan: "team",
+    status: "active",
+  };
 }
 
-export function getEffectivePlan(sub: Subscription): string {
-  if (sub.status === "active" || sub.status === "trialing") {
-    return sub.plan;
-  }
-  return "free";
+export function getEffectivePlan(_sub: Subscription): string {
+  // All features are free — everyone is on the team plan
+  return "team";
 }

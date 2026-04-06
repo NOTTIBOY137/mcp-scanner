@@ -1,4 +1,5 @@
 import type { FileContent, ScanRule, RuleMatch, Confidence } from "@/types/scan";
+import { getOwaspMapping } from "@/scanner/owasp-mapping";
 
 const SKIP_FILE_PATTERNS = [
   /\.test\.[jt]sx?$/,
@@ -107,6 +108,8 @@ export function scanFiles(
             ? rule.severityAdjuster(match, file.content)
             : rule.severity;
 
+          const owasp = getOwaspMapping(rule.id, rule.category);
+
           matches.push({
             ruleId: rule.id,
             category: rule.category,
@@ -118,6 +121,10 @@ export function scanFiles(
             snippet: line.trim(),
             confidence,
             remediation: rule.remediation,
+            owaspMcpTop10: rule.owaspMcpTop10 ?? owasp.owaspMcpTop10,
+            cweIds: rule.cweIds ?? owasp.cweIds,
+            mitreAtlasIds: rule.mitreAtlasIds ?? owasp.mitreAtlasIds,
+            remediationCode: rule.remediationCode,
           });
 
           if (!rule.pattern.flags.includes("g")) {

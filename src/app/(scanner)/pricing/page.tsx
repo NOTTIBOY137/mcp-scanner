@@ -1,171 +1,113 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Check, Minus } from "lucide-react";
-import { SubscribeButton } from "@/components/billing/SubscribeButton";
+import { Check } from "lucide-react";
+import { WaitlistForm } from "@/components/scanner/WaitlistForm";
 
 export const metadata: Metadata = {
-  title: "Pricing",
+  title: "Pricing — MCP Scanner",
   description:
-    "Choose a plan for MCP Scanner. Free security scans, API access, and server ownership verification.",
+    "MCP Scanner is free for everyone. Pro tier coming soon with advanced features.",
 };
 
-const tiers = [
-  {
-    name: "Free",
-    price: "$0",
-    period: "forever",
-    description: "For individual developers exploring MCP security.",
-    features: [
-      { text: "10 API calls/day (anonymous)", included: true },
-      { text: "100 API calls/day (signed up)", included: true },
-      { text: "5 scans/hour", included: true },
-      { text: "Security grades & badges", included: true },
-      { text: "1 server claim", included: true },
-      { text: "Priority support", included: false },
-      { text: "Custom integrations", included: false },
-    ],
-    cta: { label: "Get Started", href: "/sign-up" },
-    recommended: false,
-  },
-  {
-    name: "Pro",
-    price: "$29",
-    period: "/mo",
-    description: "For teams shipping MCP integrations in production.",
-    features: [
-      { text: "1,000 API calls/day", included: true },
-      { text: "Unlimited scans", included: true },
-      { text: "Security grades & badges", included: true },
-      { text: "10 server claims", included: true },
-      { text: "Priority support", included: true },
-      { text: "Webhook notifications", included: true },
-      { text: "Custom integrations", included: false },
-    ],
-    cta: { label: "Subscribe", plan: "pro" },
-    recommended: true,
-  },
-  {
-    name: "Team",
-    price: "$99",
-    period: "/mo",
-    description: "For organizations managing multiple MCP servers.",
-    features: [
-      { text: "10,000 API calls/day", included: true },
-      { text: "Unlimited scans", included: true },
-      { text: "Security grades & badges", included: true },
-      { text: "Unlimited server claims", included: true },
-      { text: "Priority support", included: true },
-      { text: "Webhook notifications", included: true },
-      { text: "Custom integrations", included: true },
-    ],
-    cta: { label: "Subscribe", plan: "team" },
-    recommended: false,
-  },
-  {
-    name: "Enterprise",
-    price: "Custom",
-    period: "",
-    description: "For large organizations with custom requirements.",
-    features: [
-      { text: "Unlimited API calls", included: true },
-      { text: "Unlimited scans", included: true },
-      { text: "Security grades & badges", included: true },
-      { text: "Unlimited server claims", included: true },
-      { text: "Dedicated support", included: true },
-      { text: "Webhook notifications", included: true },
-      { text: "Custom integrations & SLA", included: true },
-    ],
-    cta: {
-      label: "Contact Us",
-      href: "mailto:enterprise@mcptrust.dev",
-    },
-    recommended: false,
-  },
+const freeFeatures = [
+  "122 security rules",
+  "OWASP MCP Top 10 mapping",
+  "Config scanner",
+  "Bulk scanning",
+  "CI/CD integration",
+  "SARIF & JSON exports",
+  "Webhooks & API keys",
+  "Security badges",
+];
+
+const proFeatures = [
+  "Private repository scanning",
+  "Daily continuous monitoring",
+  "AI-powered fix suggestions",
+  "Team dashboard & analytics",
+  "SSO / SAML",
+  "Priority support",
 ];
 
 export default function PricingPage() {
   return (
-    <div className="space-y-10">
-      <div className="text-center">
-        <h1 className="font-display text-3xl font-bold">Pricing</h1>
-        <p className="mt-2 text-[var(--text-secondary)] max-w-lg mx-auto">
-          Secure your MCP ecosystem. Start free, scale as you grow.
-        </p>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        {tiers.map((tier) => (
-          <div
-            key={tier.name}
-            className={`card relative flex flex-col ${
-              tier.recommended
-                ? "ring-2 ring-[var(--accent)]/50 border-[var(--accent)]/30"
-                : ""
-            }`}
-          >
-            {tier.recommended && (
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[var(--accent)] px-3 py-1 text-xs font-medium text-white">
-                Most Popular
-              </span>
-            )}
-
-            <div className="mb-4">
-              <h2 className="font-display text-lg font-semibold">{tier.name}</h2>
-              <div className="mt-2">
-                <span className="font-mono text-3xl font-bold">{tier.price}</span>
-                <span className="text-sm text-[var(--text-secondary)]">
-                  {tier.period}
-                </span>
-              </div>
-              <p className="mt-2 text-sm text-[var(--text-secondary)]">
-                {tier.description}
-              </p>
-            </div>
-
-            <ul className="flex-1 space-y-2 mb-6">
-              {tier.features.map((feature) => (
-                <li
-                  key={feature.text}
-                  className="flex items-start gap-2 text-sm"
-                >
-                  {feature.included ? (
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
-                  ) : (
-                    <Minus className="mt-0.5 h-4 w-4 shrink-0 text-[var(--text-tertiary)]" />
-                  )}
-                  <span
-                    className={
-                      feature.included
-                        ? "text-[var(--text-secondary)]"
-                        : "text-[var(--text-tertiary)]"
-                    }
-                  >
-                    {feature.text}
-                  </span>
-                </li>
-              ))}
-            </ul>
-
-            {"href" in tier.cta ? (
-              <Link
-                href={tier.cta.href!}
-                className={`block w-full rounded-lg px-4 py-2.5 text-center text-sm font-medium transition-colors ${
-                  tier.recommended
-                    ? "bg-[var(--accent)] text-white hover:bg-cyan-500"
-                    : "bg-[var(--bg-tertiary)] text-[var(--text-primary)] hover:bg-[var(--bg-hover)]"
-                }`}
-              >
-                {tier.cta.label}
-              </Link>
-            ) : (
-              <SubscribeButton
-                plan={tier.cta.plan!}
-                recommended={tier.recommended}
-              />
-            )}
+    <div className="py-24">
+      <div className="mx-auto max-w-3xl grid grid-cols-1 md:grid-cols-2 gap-px bg-[var(--border)]">
+        {/* Free Tier */}
+        <div className="bg-[var(--bg)] p-10 flex flex-col">
+          <h2 className="text-3xl font-medium text-balance">Free</h2>
+          <div className="mt-4 flex items-baseline gap-2">
+            <span
+              className="text-4xl font-semibold text-[var(--fg)]"
+              style={{ fontFamily: "'Geist Mono', monospace" }}
+            >
+              $0
+            </span>
+            <span className="text-[var(--fg-faint)]">/ forever</span>
           </div>
-        ))}
+          <p className="mt-3 text-sm text-[var(--fg-muted)] text-pretty">
+            Everything. No limits. No catch.
+          </p>
+
+          <ul className="mt-8 space-y-3 flex-1">
+            {freeFeatures.map((feature) => (
+              <li key={feature} className="flex items-center gap-3 text-sm">
+                <Check
+                  className="size-4 shrink-0 text-[var(--fg-ghost)]"
+                  aria-hidden="true"
+                />
+                <span className="text-[var(--fg-muted)]">{feature}</span>
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-10">
+            <Link href="/scan" className="btn-primary inline-block text-center w-full">
+              Get Started
+            </Link>
+          </div>
+        </div>
+
+        {/* Pro Tier */}
+        <div className="bg-[var(--bg)] p-10 flex flex-col">
+          <div className="flex items-center gap-3">
+            <h2 className="text-3xl font-medium text-balance">Pro</h2>
+            <span className="rounded-full border border-[var(--border)] px-2.5 py-0.5 text-xs text-[var(--fg-ghost)]">
+              Coming Soon
+            </span>
+          </div>
+          <div className="mt-4">
+            <p className="text-sm text-[var(--fg-muted)] text-pretty">
+              Private repos, continuous monitoring, team dashboard.
+            </p>
+          </div>
+
+          <ul className="mt-8 space-y-3 flex-1">
+            {proFeatures.map((feature) => (
+              <li key={feature} className="flex items-center gap-3 text-sm">
+                <Check
+                  className="size-4 shrink-0 text-[var(--fg-ghost)]"
+                  aria-hidden="true"
+                />
+                <span className="text-[var(--fg-muted)]">{feature}</span>
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-10">
+            <WaitlistForm
+              plan="pro"
+              buttonLabel="Join Waitlist"
+              recommended={false}
+            />
+          </div>
+        </div>
       </div>
+
+      {/* Bottom line */}
+      <p className="mt-16 text-center text-sm text-[var(--fg-ghost)]">
+        Free for open source. Forever.
+      </p>
     </div>
   );
 }
