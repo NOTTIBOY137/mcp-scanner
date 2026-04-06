@@ -1,0 +1,22 @@
+# GitHub App Manifest
+# See: https://docs.github.com/en/apps/sharing-github-apps/registering-a-github-app-from-a-manifest
+
+name: MCP Config Scanner
+description: Scans pull requests for insecure MCP (Model Context Protocol) configuration files and provides inline security feedback.
+url: https://github.com/your-org/mcp-scanner
+
+# Public page
+public: true
+
+default_events:
+  - pull_request
+
+default_permissions:
+  pull_requests: write
+  contents: write
+  checks: write
+  metadata: read
+
+# Webhook URL (update for your deployment)
+# hook_attributes:
+#   url: https://your-app.vercel.app/api/github/webhooks

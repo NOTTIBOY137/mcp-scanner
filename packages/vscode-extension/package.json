@@ -1,0 +1,47 @@
+{
+  "name": "mcp-config-guardian",
+  "displayName": "MCP Config Guardian",
+  "description": "Real-time security scanner for MCP configuration files. Detects hardcoded secrets, dangerous commands, and insecure server configs.",
+  "version": "0.1.0",
+  "publisher": "mcp-scanner",
+  "license": "MIT",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Linters"],
+  "activationEvents": [
+    "onLanguage:json",
+    "onLanguage:jsonc",
+    "workspaceContains:**/.vscode/mcp.json",
+    "workspaceContains:**/.cursor/mcp.json",
+    "workspaceContains:**/.mcp.json",
+    "workspaceContains:**/claude_desktop_config.json"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [{
+      "command": "mcpGuardian.scanWorkspace",
+      "title": "MCP Guardian: Scan Workspace for MCP Config Issues"
+    }],
+    "configuration": {
+      "title": "MCP Config Guardian",
+      "properties": {
+        "mcpGuardian.enableRealTimeScanning": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable real-time scanning of MCP config files"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0"
+  },
+  "dependencies": {
+    "jsonc-parser": "^3.3.1"
+  }
+}

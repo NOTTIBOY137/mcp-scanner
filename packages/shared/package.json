@@ -1,0 +1,16 @@
+{
+  "name": "@mcp-scanner/shared",
+  "version": "1.0.0",
+  "description": "Shared MCP security detection rules for GitHub App, VS Code extension, and MCP server",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.8.0"
+  }
+}

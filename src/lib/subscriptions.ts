@@ -1,7 +1,3 @@
-import { db } from "@/lib/db";
-import { subscriptions } from "@/db/schema";
-import { eq } from "drizzle-orm";
-
 export interface Subscription {
   id: string;
   clerkUserId: string;

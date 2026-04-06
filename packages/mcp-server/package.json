@@ -1,0 +1,24 @@
+{
+  "name": "@mcp-scanner/security-checker",
+  "version": "1.0.0",
+  "description": "MCP server that lets AI assistants audit MCP configurations for security issues",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": { "mcp-security-checker": "./dist/index.js" },
+  "files": ["dist", "README.md"],
+  "scripts": {
+    "build": "tsc && chmod +x dist/index.js",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.8.0",
+    "tsx": "^4.0.0"
+  }
+}
