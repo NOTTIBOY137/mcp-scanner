@@ -1,310 +1,246 @@
 import { db } from "@/lib/db";
 import { servers, scans } from "@/db/schema";
 import { desc, asc, isNotNull, eq, and, ilike, or } from "drizzle-orm";
-import { Search } from "lucide-react";
+import { Search, Shield, ExternalLink } from "lucide-react";
 import Link from "next/link";
-import { GRADE_THRESHOLDS, type Grade } from "@/types/grade";
+import type { Metadata } from "next";
 
 export const revalidate = 600;
 
-import type { Metadata } from "next";
-
 export const metadata: Metadata = {
-  title: "MCP Security Leaderboard",
-  description:
-    "Every MCP server ranked by security score. See which servers are safe and which have vulnerabilities.",
+  title: "MCP Security Registry",
+  description: "Every MCP server ranked by security score. Browse, search, and compare MCP servers.",
 };
 
 const FILTERS = [
   { key: "all", label: "All" },
-  { key: "good", label: "A\u2013B" },
-  { key: "risk", label: "C\u2013D" },
-  { key: "fail", label: "F" },
+  { key: "safe", label: "Safe" },
+  { key: "review", label: "Review" },
+  { key: "risky", label: "Risky" },
 ] as const;
 
-const GRADE_CSS: Record<string, string> = {
-  A: "bg-[var(--grade-A)]",
-  B: "bg-[var(--grade-B)]",
-  C: "bg-[var(--grade-C)]",
-  D: "bg-[var(--grade-D)]",
-  F: "bg-[var(--grade-F)]",
-};
+function scoreColor(score: number | null): string {
+  if (score === null) return "text-zinc-500";
+  if (score >= 80) return "text-emerald-400";
+  if (score >= 60) return "text-amber-400";
+  if (score >= 40) return "text-orange-400";
+  return "text-red-400";
+}
+
+function scoreBg(score: number | null): string {
+  if (score === null) return "bg-zinc-800";
+  if (score >= 80) return "bg-emerald-500/10 border-emerald-500/20";
+  if (score >= 60) return "bg-amber-500/10 border-amber-500/20";
+  if (score >= 40) return "bg-orange-500/10 border-orange-500/20";
+  return "bg-red-500/10 border-red-500/20";
+}
+
+function statusBadge(score: number | null): { label: string; cls: string } {
+  if (score === null) return { label: "Unknown", cls: "text-zinc-400 border-zinc-700 bg-zinc-800/50" };
+  if (score >= 80) return { label: "Safe", cls: "text-emerald-400 border-emerald-500/20 bg-emerald-500/10" };
+  if (score >= 50) return { label: "Review", cls: "text-amber-400 border-amber-500/20 bg-amber-500/10" };
+  if (score >= 20) return { label: "Risky", cls: "text-orange-400 border-orange-500/20 bg-orange-500/10" };
+  return { label: "Dangerous", cls: "text-red-400 border-red-500/20 bg-red-500/10" };
+}
 
 export default async function LeaderboardPage({
   searchParams,
 }: {
-  searchParams: Promise<{
-    filter?: string;
-    sort?: string;
-    q?: string;
-    page?: string;
-  }>;
+  searchParams: Promise<{ filter?: string; q?: string; page?: string }>;
 }) {
   const params = await searchParams;
   const page = Math.max(1, parseInt(params.page ?? "1", 10));
-  const pageSize = 20;
+  const pageSize = 24;
   const filter = params.filter ?? "all";
-  const sort = params.sort ?? "best";
 
   let results: {
-    id: string;
-    name: string;
-    owner: string;
-    repo: string;
-    description: string | null;
-    stars: number | null;
-    latestGrade: string | null;
-    latestScore: number | null;
-    findingsCount: number | null;
-    lastScannedAt: Date | null;
+    id: string; name: string; owner: string; repo: string;
+    description: string | null; stars: number | null;
+    language: string | null;
+    latestGrade: string | null; latestScore: number | null;
+    findingsCount: number | null; lastScannedAt: Date | null;
   }[] = [];
   let dbError = false;
 
   try {
     let gradeFilter;
-    if (filter === "good") {
-      gradeFilter = or(
-        eq(servers.latestGrade, "A"),
-        eq(servers.latestGrade, "B")
-      );
-    } else if (filter === "risk") {
-      gradeFilter = or(
-        eq(servers.latestGrade, "C"),
-        eq(servers.latestGrade, "D")
-      );
-    } else if (filter === "fail") {
-      gradeFilter = eq(servers.latestGrade, "F");
-    }
+    if (filter === "safe") gradeFilter = or(eq(servers.latestGrade, "A"), eq(servers.latestGrade, "B"));
+    else if (filter === "review") gradeFilter = or(eq(servers.latestGrade, "C"), eq(servers.latestGrade, "D"));
+    else if (filter === "risky") gradeFilter = eq(servers.latestGrade, "F");
 
     const queryFilter = params.q
-      ? or(
-          ilike(servers.name, `%${params.q}%`),
-          ilike(servers.owner, `%${params.q}%`),
-          ilike(servers.repo, `%${params.q}%`)
-        )
+      ? or(ilike(servers.name, `%${params.q}%`), ilike(servers.owner, `%${params.q}%`), ilike(servers.repo, `%${params.q}%`))
       : undefined;
-
-    const where = and(isNotNull(servers.latestGrade), gradeFilter, queryFilter);
-
-    let orderBy;
-    if (sort === "worst") {
-      orderBy = asc(servers.latestScore);
-    } else if (sort === "recent") {
-      orderBy = desc(servers.updatedAt);
-    } else {
-      orderBy = desc(servers.latestScore);
-    }
 
     results = await db
       .select({
-        id: servers.id,
-        name: servers.name,
-        owner: servers.owner,
-        repo: servers.repo,
-        description: servers.description,
-        stars: servers.stars,
-        latestGrade: servers.latestGrade,
-        latestScore: servers.latestScore,
-        findingsCount: scans.findingsCount,
-        lastScannedAt: scans.completedAt,
+        id: servers.id, name: servers.name, owner: servers.owner, repo: servers.repo,
+        description: servers.description, stars: servers.stars, language: servers.language,
+        latestGrade: servers.latestGrade, latestScore: servers.latestScore,
+        findingsCount: scans.findingsCount, lastScannedAt: scans.completedAt,
       })
       .from(servers)
       .leftJoin(scans, eq(servers.latestScanId, scans.id))
-      .where(where)
-      .orderBy(orderBy)
+      .where(and(isNotNull(servers.latestGrade), gradeFilter, queryFilter))
+      .orderBy(desc(servers.latestScore))
       .limit(pageSize)
       .offset((page - 1) * pageSize);
-  } catch {
-    dbError = true;
-  }
+  } catch { dbError = true; }
 
   function buildUrl(overrides: Record<string, string>) {
     const p = new URLSearchParams();
-    const base = { filter, sort, q: params.q ?? "", page: String(page) };
-    const merged = { ...base, ...overrides };
+    const merged = { filter, q: params.q ?? "", page: String(page), ...overrides };
     for (const [k, v] of Object.entries(merged)) {
-      if (v && v !== "all" && v !== "best" && !(k === "page" && v === "1")) {
-        p.set(k, v);
-      }
+      if (v && v !== "all" && !(k === "page" && v === "1")) p.set(k, v);
     }
     const qs = p.toString();
     return `/leaderboard${qs ? `?${qs}` : ""}`;
   }
 
   return (
-    <div className="py-24 space-y-10">
-      {/* Header row: title left, search right */}
-      <div className="flex items-center justify-between gap-6">
-        <h1 className="text-2xl font-medium text-balance">Leaderboard</h1>
+    <div className="pt-16 pb-24">
+      {/* Header */}
+      <div className="text-center mb-10">
+        <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-foreground">
+          MCP Security Registry
+        </h1>
+        <p className="mt-3 text-muted max-w-lg mx-auto">
+          Every scanned MCP server ranked by security score. Find safe servers for your AI agent workflows.
+        </p>
+      </div>
 
-        <form
-          className="relative w-full max-w-[240px]"
-          action="/leaderboard"
-          method="GET"
-        >
-          {filter !== "all" && (
-            <input type="hidden" name="filter" value={filter} />
-          )}
-          {sort !== "best" && (
-            <input type="hidden" name="sort" value={sort} />
-          )}
-          <Search
-            className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[var(--fg-ghost)]"
-            aria-hidden="true"
-          />
-          <input
-            name="q"
-            type="text"
-            placeholder="Search..."
-            defaultValue={params.q}
-            className="input pl-9 w-full"
-          />
+      {/* Search + Filters */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
+        <div className="flex items-center gap-4">
+          {FILTERS.map((f) => (
+            <a
+              key={f.key}
+              href={buildUrl({ filter: f.key, page: "1" })}
+              className={`text-sm font-medium transition-colors ${
+                filter === f.key ? "text-foreground" : "text-muted-foreground hover:text-muted"
+              }`}
+            >
+              {f.label}
+            </a>
+          ))}
+        </div>
+        <form className="relative w-full sm:w-64" action="/leaderboard" method="GET">
+          {filter !== "all" && <input type="hidden" name="filter" value={filter} />}
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" aria-hidden="true" />
+          <input name="q" type="text" placeholder="Search servers..." defaultValue={params.q} className="input pl-9 w-full" />
         </form>
       </div>
 
-      {/* Filter tabs */}
-      <div className="flex items-center gap-6">
-        {FILTERS.map((f) => (
-          <a
-            key={f.key}
-            href={buildUrl({ filter: f.key, page: "1" })}
-            className={`text-sm transition-colors ${
-              filter === f.key
-                ? "text-[var(--fg)]"
-                : "text-[var(--fg-faint)] hover:text-[var(--fg-muted)]"
-            }`}
-          >
-            {f.label}
-          </a>
-        ))}
-      </div>
-
       {dbError && (
-        <div className="card text-center">
-          <p className="font-medium text-[var(--fg)]">
-            Failed to load leaderboard data.
-          </p>
-          <p className="mt-1 text-sm text-[var(--fg-muted)]">
-            Database connection timed out. Please refresh the page.
-          </p>
+        <div className="rounded-xl border border-white/10 bg-card text-center p-8">
+          <p className="text-foreground font-medium">Failed to load data.</p>
+          <p className="mt-1 text-sm text-muted">Please refresh the page.</p>
         </div>
       )}
 
-      {/* Data Table */}
-      <div className="overflow-x-auto">
-        <table className="data-table w-full text-sm">
-          <thead>
-            <tr>
-              <th className="w-12 text-right">#</th>
-              <th className="w-16 text-center">Grade</th>
-              <th className="text-left">Server</th>
-              <th className="hidden md:table-cell text-right">Score</th>
-              <th className="hidden sm:table-cell text-right">Findings</th>
-              <th className="hidden md:table-cell text-right">Scanned</th>
-            </tr>
-          </thead>
-          <tbody>
-            {results.map((server, i) => {
-              const rank = (page - 1) * pageSize + i + 1;
-              const grade = (server.latestGrade as Grade) ?? null;
-              const bgClass = grade ? GRADE_CSS[grade] ?? "" : "";
+      {/* Card Grid */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {results.map((server) => {
+          const badge = statusBadge(server.latestScore);
+          const avatarUrl = `https://github.com/${server.owner}.png?size=80`;
 
-              return (
-                <tr
-                  key={server.id}
-                  className="group transition-colors hover:bg-[var(--bg-hover)]"
-                  style={{ height: 52 }}
-                >
-                  <td
-                    className="text-right text-[var(--fg-ghost)]"
-                    style={{ fontFamily: "'Geist Mono', monospace" }}
-                  >
-                    {rank}
-                  </td>
-                  <td className="text-center">
-                    <span
-                      className={`inline-flex items-center justify-center size-6 rounded-full text-xs font-semibold text-white ${bgClass}`}
-                    >
-                      {grade ?? "?"}
-                    </span>
-                  </td>
-                  <td>
-                    <Link
-                      href={`/server/${server.id}`}
-                      className="text-[var(--fg)] hover:text-[var(--accent-hover)] transition-colors"
-                    >
+          return (
+            <Link
+              key={server.id}
+              href={`/server/${server.id}`}
+              className="group rounded-xl border border-white/10 bg-card p-5 transition-all duration-300 hover:border-white/20 hover:bg-card-hover"
+            >
+              {/* Top: Avatar + Name + Score */}
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  {/* GitHub Avatar */}
+                  <img
+                    src={avatarUrl}
+                    alt=""
+                    width={36}
+                    height={36}
+                    className="size-9 rounded-lg border border-white/10 bg-zinc-900 shrink-0"
+                    loading="lazy"
+                    aria-hidden="true"
+                  />
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-sm font-medium text-foreground truncate">
+                        {server.name}
+                      </span>
+                      {server.latestScore !== null && server.latestScore >= 80 && (
+                        <Shield className="size-3.5 text-emerald-400 shrink-0" aria-label="Verified safe" />
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground truncate">
                       {server.owner}/{server.repo}
-                    </Link>
-                  </td>
-                  <td
-                    className="hidden md:table-cell text-right text-[var(--fg)]"
-                    style={{ fontFamily: "'Geist Mono', monospace" }}
-                  >
-                    {server.latestScore ?? "\u2014"}
-                  </td>
-                  <td
-                    className="hidden sm:table-cell text-right text-[var(--fg-muted)]"
-                    style={{ fontFamily: "'Geist Mono', monospace" }}
-                  >
-                    {server.findingsCount ?? 0}
-                  </td>
-                  <td className="hidden md:table-cell text-right text-[var(--fg-faint)]">
-                    {server.lastScannedAt
-                      ? new Date(server.lastScannedAt).toLocaleDateString(
-                          "en-US",
-                          { month: "short", day: "numeric" }
-                        )
-                      : "\u2014"}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                    </p>
+                  </div>
+                </div>
+
+                {/* Score */}
+                <div className={`shrink-0 rounded-lg border px-2.5 py-1 text-right ${scoreBg(server.latestScore)}`}>
+                  <span className={`text-lg font-bold font-mono tabular-nums ${scoreColor(server.latestScore)}`}>
+                    {server.latestScore ?? "—"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Description */}
+              {server.description && (
+                <p className="mt-3 text-xs text-muted leading-relaxed line-clamp-2">
+                  {server.description}
+                </p>
+              )}
+
+              {/* Bottom: Badge + Stats */}
+              <div className="mt-4 flex items-center justify-between">
+                <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium ${badge.cls}`}>
+                  {badge.label}
+                </span>
+                <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
+                  {server.findingsCount !== null && server.findingsCount > 0 && (
+                    <span>{server.findingsCount} findings</span>
+                  )}
+                  {server.language && <span>{server.language}</span>}
+                  {server.stars !== null && server.stars > 0 && (
+                    <span className="flex items-center gap-0.5">
+                      <svg className="size-3" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                        <path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z" />
+                      </svg>
+                      {server.stars.toLocaleString()}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </Link>
+          );
+        })}
       </div>
 
+      {/* Empty */}
       {results.length === 0 && !dbError && (
-        <div className="text-center py-16">
-          <p className="text-[var(--fg-muted)]">No servers found.</p>
+        <div className="text-center py-20">
+          <p className="text-muted">No servers found.</p>
           {params.q && (
-            <a
-              href="/leaderboard"
-              className="mt-2 inline-block text-sm text-[var(--accent)] hover:text-[var(--accent-hover)]"
-            >
-              Clear search
-            </a>
+            <a href="/leaderboard" className="mt-2 inline-block text-sm text-brand-400 hover:underline">Clear search</a>
           )}
         </div>
       )}
 
       {/* Pagination */}
       {(results.length === pageSize || page > 1) && (
-        <div className="flex items-center justify-center gap-6 pt-4">
+        <div className="flex items-center justify-center gap-6 pt-10">
           {page > 1 ? (
-            <a
-              href={buildUrl({ page: String(page - 1) })}
-              className="text-sm text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
-            >
-              Previous
-            </a>
+            <a href={buildUrl({ page: String(page - 1) })} className="text-sm text-muted hover:text-foreground transition-colors">Previous</a>
           ) : (
-            <span className="text-sm text-[var(--fg-ghost)]">Previous</span>
+            <span className="text-sm text-muted-foreground">Previous</span>
           )}
-          <span
-            className="text-sm text-[var(--fg-ghost)]"
-            style={{ fontFamily: "'Geist Mono', monospace" }}
-          >
-            {page}
-          </span>
+          <span className="text-sm text-muted-foreground font-mono">{page}</span>
           {results.length === pageSize ? (
-            <a
-              href={buildUrl({ page: String(page + 1) })}
-              className="text-sm text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors"
-            >
-              Next
-            </a>
+            <a href={buildUrl({ page: String(page + 1) })} className="text-sm text-muted hover:text-foreground transition-colors">Next</a>
           ) : (
-            <span className="text-sm text-[var(--fg-ghost)]">Next</span>
+            <span className="text-sm text-muted-foreground">Next</span>
           )}
         </div>
       )}
