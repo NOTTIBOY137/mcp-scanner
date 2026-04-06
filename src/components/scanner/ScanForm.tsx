@@ -6,45 +6,18 @@ import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
 
 type InputFormat = "github-url" | "owner-repo" | "npm" | "unknown";
 
-function detectFormat(input: string): {
-  type: InputFormat;
-  normalized?: string;
-} {
+function detectFormat(input: string): { type: InputFormat; normalized?: string } {
   const trimmed = input.trim();
   if (!trimmed) return { type: "unknown" };
-
   if (trimmed.startsWith("@") || /^[a-z][a-z0-9-]*$/.test(trimmed)) {
     if (trimmed.startsWith("@")) return { type: "npm" };
   }
-
-  const urlMatch = trimmed.match(
-    /^https?:\/\/(www\.)?github\.com\/([^/\s]+)\/([^/\s]+)/
-  );
-  if (urlMatch) {
-    return {
-      type: "github-url",
-      normalized: `https://github.com/${urlMatch[2]}/${urlMatch[3].replace(/\.git$/, "")}`,
-    };
-  }
-
+  const urlMatch = trimmed.match(/^https?:\/\/(www\.)?github\.com\/([^/\s]+)\/([^/\s]+)/);
+  if (urlMatch) return { type: "github-url", normalized: `https://github.com/${urlMatch[2]}/${urlMatch[3].replace(/\.git$/, "")}` };
   const shortMatch = trimmed.match(/^([a-zA-Z0-9_.-]+)\/([a-zA-Z0-9_.-]+)$/);
-  if (shortMatch) {
-    return {
-      type: "owner-repo",
-      normalized: `https://github.com/${shortMatch[1]}/${shortMatch[2]}`,
-    };
-  }
-
-  const noProtocol = trimmed.match(
-    /^github\.com\/([^/\s]+)\/([^/\s]+)/
-  );
-  if (noProtocol) {
-    return {
-      type: "github-url",
-      normalized: `https://github.com/${noProtocol[1]}/${noProtocol[2].replace(/\.git$/, "")}`,
-    };
-  }
-
+  if (shortMatch) return { type: "owner-repo", normalized: `https://github.com/${shortMatch[1]}/${shortMatch[2]}` };
+  const noProto = trimmed.match(/^github\.com\/([^/\s]+)\/([^/\s]+)/);
+  if (noProto) return { type: "github-url", normalized: `https://github.com/${noProto[1]}/${noProto[2].replace(/\.git$/, "")}` };
   return { type: "unknown" };
 }
 
@@ -70,27 +43,17 @@ export function ScanForm() {
     if (!isValid) return;
     setError(null);
     setLoading(true);
-
     try {
       const res = await fetch("/api/scan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ repoUrl: format.normalized }),
       });
-
       const data = await res.json();
-
       if (!res.ok) {
-        if (res.status === 429) {
-          setError("Rate limited. Too many scans right now. Try again in a few minutes.");
-        } else if (res.status === 404) {
-          setError("Repository not found. Check the URL and try again.");
-        } else {
-          setError(data.error ?? "Scan failed. Please try again.");
-        }
+        setError(res.status === 429 ? "Rate limited. Try again in a few minutes." : data.error ?? "Scan failed.");
         return;
       }
-
       router.push(`/results/${data.id}`);
     } catch {
       setError("Network error. Please try again.");
@@ -102,10 +65,7 @@ export function ScanForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label
-          htmlFor="repo-url"
-          className="mb-2 block text-sm font-medium text-[var(--text-secondary)]"
-        >
+        <label htmlFor="repo-url" className="mb-2 block text-sm text-muted">
           GitHub Repository
         </label>
         <div className="relative">
@@ -113,54 +73,43 @@ export function ScanForm() {
             id="repo-url"
             type="text"
             value={url}
-            onChange={(e) => {
-              setUrl(e.target.value);
-              setError(null);
-            }}
-            placeholder="https://github.com/owner/repo  or  owner/repo"
+            onChange={(e) => { setUrl(e.target.value); setError(null); }}
+            placeholder="github.com/owner/repo or owner/repo"
             className="input pr-10"
             required
           />
           {showValidation && (
             <span className="absolute right-3 top-1/2 -translate-y-1/2">
-              {isValid ? (
-                <CheckCircle2 className="h-4.5 w-4.5 text-emerald-400" />
-              ) : (
-                <XCircle className="h-4.5 w-4.5 text-red-400" />
-              )}
+              {isValid ? <CheckCircle2 className="size-4 text-secure" /> : <XCircle className="size-4 text-critical" />}
             </span>
           )}
         </div>
         {showValidation && isNpm && (
-          <p className="mt-2 text-xs text-amber-400">
-            npm package scanning coming soon. Enter a GitHub URL instead.
-          </p>
+          <p className="mt-2 text-xs text-warning">npm package scanning coming soon. Enter a GitHub URL instead.</p>
         )}
         {showValidation && !isValid && !isNpm && (
-          <p className="mt-2 text-xs text-[var(--text-tertiary)]">
-            Accepts: https://github.com/owner/repo or owner/repo
-          </p>
+          <p className="mt-2 text-xs text-muted-foreground">Accepts: https://github.com/owner/repo or owner/repo</p>
         )}
       </div>
 
       {error && (
-        <div className="rounded-lg border border-red-500/30 bg-red-500/5 p-3">
-          <p className="text-sm text-red-400">{error}</p>
+        <div className="rounded-lg border border-critical/30 bg-critical/5 p-3">
+          <p className="text-sm text-critical">{error}</p>
         </div>
       )}
 
       <button
         type="submit"
         disabled={loading || !isValid}
-        className="btn-primary w-full py-3"
+        className="w-full rounded-lg bg-white px-6 py-3 text-sm font-medium text-black transition hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
       >
         {loading ? (
           <span className="flex items-center justify-center gap-2">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Scanning
+            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+            Scanning...
           </span>
         ) : (
-          "Start Security Scan"
+          "Scan Now"
         )}
       </button>
     </form>

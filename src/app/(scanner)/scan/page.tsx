@@ -1,36 +1,37 @@
 import { Suspense } from "react";
 import { Shield } from "lucide-react";
 import { ScanForm } from "@/components/scanner/ScanForm";
-
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Scan a Server",
-  description:
-    "Enter a GitHub repository URL to scan any MCP server for security vulnerabilities. Results in seconds.",
+  description: "Scan any MCP server for security vulnerabilities. 122 rules across 15 categories.",
 };
 
 export default function ScanPage() {
   return (
-    <div className="mx-auto max-w-xl space-y-6">
-      <div>
-        <h1 className="font-display text-2xl font-bold">Scan an MCP Server</h1>
-        <p className="mt-2 text-[var(--text-secondary)]">
-          Enter a GitHub repository URL to scan for security vulnerabilities.
-          We check for 10 vulnerability categories including tool poisoning,
-          command injection, path traversal, SSRF, and more.
+    <div className="mx-auto max-w-lg pt-20 pb-24">
+      <div className="text-center mb-10">
+        <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-foreground">
+          Scan an MCP server
+        </h1>
+        <p className="mt-3 text-muted leading-relaxed">
+          Enter a GitHub repository URL. We check for 15 vulnerability categories
+          including tool poisoning, command injection, and credential theft.
         </p>
       </div>
-      <div className="card">
+
+      <div className="rounded-xl border border-white/10 bg-card p-6">
         <Suspense>
           <ScanForm />
         </Suspense>
       </div>
-      <div className="flex items-start gap-2 text-xs text-[var(--text-tertiary)]">
-        <Shield className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+
+      <div className="flex items-start gap-2.5 mt-6 text-xs text-muted-foreground">
+        <Shield className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
         <p>
-          Scans analyze your public source code for security patterns. Results
-          are cached for 1 hour. Only public repositories can be scanned.
+          Scans analyze public source code for security patterns.
+          Results are cached for 1 hour. Only public repositories can be scanned.
         </p>
       </div>
     </div>
