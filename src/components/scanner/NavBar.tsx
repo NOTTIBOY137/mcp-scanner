@@ -26,11 +26,12 @@ export function NavBar() {
         className="mx-auto flex h-full max-w-5xl items-center justify-between px-6 lg:px-8"
         aria-label="Main"
       >
-        <Link
-          href="/"
-          className="text-[15px] font-semibold text-[var(--fg)] tracking-tight"
-        >
-          MCP Scanner
+        <Link href="/" className="flex items-center gap-2 shrink-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo-compact.svg" alt="" width={16} height={18} aria-hidden="true" />
+          <span className="text-[15px] font-semibold text-[var(--fg)] tracking-tight">
+            MCP Scanner
+          </span>
         </Link>
 
         {/* Desktop */}

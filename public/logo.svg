@@ -1,0 +1,16 @@
+<svg width="140" height="142" viewBox="0 0 140 142" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Shield shape -->
+  <path d="M70 4L130 30V80Q130 118 70 142Q10 118 10 80V30Z" fill="none" stroke="#06b6d4" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- Radar circles -->
+  <circle cx="70" cy="73" r="18" fill="none" stroke="#06b6d4" stroke-width="0.8" opacity="0.3"/>
+  <circle cx="70" cy="73" r="35" fill="none" stroke="#06b6d4" stroke-width="0.8" opacity="0.2"/>
+  <!-- Radar sweep line -->
+  <path d="M70 73L70 38" stroke="#06b6d4" stroke-width="1.5" opacity="0.8"/>
+  <path d="M70 73L100 52" stroke="#06b6d4" stroke-width="1.5" opacity="0.4"/>
+  <!-- Sweep fill -->
+  <path d="M70 73L70 38A35 35 0 0 1 100 52Z" fill="#06b6d4" fill-opacity="0.12"/>
+  <!-- Threat blips -->
+  <circle cx="58" cy="58" r="2.5" fill="#06b6d4" opacity="0.8"/>
+  <circle cx="85" cy="65" r="2" fill="#06b6d4" opacity="0.5"/>
+  <circle cx="62" cy="82" r="2" fill="#06b6d4" opacity="0.6"/>
+</svg>

@@ -1,0 +1,7 @@
+<svg width="200" height="36" viewBox="0 0 200 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Compact shield -->
+  <path d="M16 2L30 8V20Q30 30 16 34Q2 30 2 20V8Z" fill="#06b6d4"/>
+  <path d="M10 17L14 21L22 13" fill="none" stroke="#09090b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Wordmark -->
+  <text x="40" y="25" font-family="Geist, system-ui, sans-serif" font-size="22" font-weight="600" letter-spacing="-0.5" fill="#fafafa">MCP<tspan fill="#06b6d4">Guard</tspan></text>
+</svg>
