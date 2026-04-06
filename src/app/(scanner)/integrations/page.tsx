@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { GitBranch, Copy, CheckCircle2 } from "lucide-react";
+import { Copy, CheckCircle2 } from "lucide-react";
 
 export default function IntegrationsPage() {
   const [owner, setOwner] = useState("");
@@ -14,147 +14,67 @@ export default function IntegrationsPage() {
   async function generate() {
     setLoading(true);
     try {
-      const res = await fetch("/api/generate/github-action", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ owner, repo, failBelow: threshold }),
-      });
+      const res = await fetch("/api/generate/github-action", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ owner, repo, failBelow: threshold }) });
       const data = await res.json();
       if (data.yaml) setYaml(data.yaml);
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   }
 
-  function copyYaml() {
-    navigator.clipboard.writeText(yaml);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }
+  function copyYaml() { navigator.clipboard.writeText(yaml); setCopied(true); setTimeout(() => setCopied(false), 2000); }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8">
-      <div>
-        <div className="inline-flex items-center gap-2 rounded-full border border-purple-500/30 bg-purple-500/5 px-3 py-1 text-xs font-medium text-purple-400 mb-4">
-          <GitBranch className="h-3.5 w-3.5" />
-          CI/CD Integration
-        </div>
-        <h1 className="font-display text-3xl font-bold">
-          GitHub Actions Integration
-        </h1>
-        <p className="mt-2 text-[var(--text-secondary)]">
-          Generate a GitHub Actions workflow that scans your MCP server on every push
-          and blocks PRs that fall below your security threshold.
-        </p>
+    <div className="mx-auto max-w-2xl pt-20 pb-24">
+      <div className="text-center mb-10">
+        <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-foreground">CI/CD Integration</h1>
+        <p className="mt-3 text-muted leading-relaxed">Generate a GitHub Actions workflow that scans your MCP server on every push and blocks PRs below your threshold.</p>
       </div>
 
-      <div className="card space-y-4">
+      <div className="rounded-xl border border-white/10 bg-card p-6 space-y-4">
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">
-              Repository Owner
-            </label>
-            <input
-              type="text"
-              value={owner}
-              onChange={(e) => setOwner(e.target.value)}
-              placeholder="modelcontextprotocol"
-              className="input w-full"
-            />
+            <label className="block text-sm text-muted mb-1.5">Repository Owner</label>
+            <input type="text" value={owner} onChange={(e) => setOwner(e.target.value)} placeholder="modelcontextprotocol" className="input" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">
-              Repository Name
-            </label>
-            <input
-              type="text"
-              value={repo}
-              onChange={(e) => setRepo(e.target.value)}
-              placeholder="servers"
-              className="input w-full"
-            />
+            <label className="block text-sm text-muted mb-1.5">Repository Name</label>
+            <input type="text" value={repo} onChange={(e) => setRepo(e.target.value)} placeholder="servers" className="input" />
           </div>
         </div>
-
         <div>
-          <label className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">
-            Fail Below Grade
-          </label>
+          <label className="block text-sm text-muted mb-1.5">Fail Below Grade</label>
           <div className="flex gap-2">
             {["A", "B", "C", "D", "F"].map((g) => (
-              <button
-                key={g}
-                onClick={() => setThreshold(g)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
-                  threshold === g
-                    ? "border-[var(--accent)] bg-[var(--accent)]/10 text-[var(--accent)]"
-                    : "border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]"
+              <button key={g} onClick={() => setThreshold(g)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors cursor-pointer ${
+                  threshold === g ? "border-brand-500 bg-brand-500/10 text-brand-400" : "border-white/10 text-muted-foreground hover:bg-white/5"
                 }`}
-              >
-                {g}
-              </button>
+              >{g}</button>
             ))}
           </div>
-          <p className="mt-1.5 text-xs text-[var(--text-tertiary)]">
-            CI will fail if the scan grade is at or below this threshold.
-          </p>
+          <p className="mt-1.5 text-xs text-muted-foreground">CI will fail if grade is at or below this.</p>
         </div>
-
-        <button
-          onClick={generate}
-          disabled={!owner || !repo || loading}
-          className="btn-primary w-full py-3 text-base font-semibold rounded-xl disabled:opacity-50"
-        >
-          {loading ? "Generating..." : "Generate Workflow"}
-        </button>
+        <button onClick={generate} disabled={!owner || !repo || loading}
+          className="w-full rounded-lg bg-white px-6 py-3 text-sm font-medium text-black transition hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+        >{loading ? "Generating..." : "Generate Workflow"}</button>
       </div>
 
       {yaml && (
-        <div className="card space-y-3">
+        <div className="mt-10 rounded-xl border border-white/10 bg-card p-6 space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="font-display font-semibold">
-              .github/workflows/mcp-scan.yml
-            </h2>
-            <button
-              onClick={copyYaml}
-              className="inline-flex items-center gap-1.5 text-xs text-[var(--accent)] hover:text-[var(--accent-glow)] transition-colors"
-            >
-              {copied ? (
-                <>
-                  <CheckCircle2 className="h-3.5 w-3.5" />
-                  Copied!
-                </>
-              ) : (
-                <>
-                  <Copy className="h-3.5 w-3.5" />
-                  Copy
-                </>
-              )}
+            <h2 className="text-sm font-medium text-foreground">.github/workflows/mcp-scan.yml</h2>
+            <button onClick={copyYaml} className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-muted transition-colors cursor-pointer">
+              {copied ? <><CheckCircle2 className="size-3.5" aria-hidden="true" /> Copied</> : <><Copy className="size-3.5" aria-hidden="true" /> Copy</>}
             </button>
           </div>
-          <pre className="overflow-x-auto rounded-lg bg-[var(--bg-primary)] border border-[var(--border-subtle)] p-4 font-mono text-xs text-[var(--text-secondary)] leading-relaxed">
-            {yaml}
-          </pre>
-          <p className="text-xs text-[var(--text-tertiary)]">
-            Save this file to your repository at{" "}
-            <code className="font-mono bg-[var(--bg-tertiary)] px-1 py-0.5 rounded">
-              .github/workflows/mcp-scan.yml
-            </code>{" "}
-            and it will run on every push and pull request.
-          </p>
+          <pre className="code-block">{yaml}</pre>
+          <p className="text-xs text-muted-foreground">Save to <code className="font-mono bg-white/5 px-1.5 py-0.5 rounded border border-white/10">.github/workflows/mcp-scan.yml</code></p>
         </div>
       )}
 
-      <div className="card bg-[var(--bg-secondary)]">
-        <h3 className="font-display font-semibold mb-3">Other CI/CD Platforms</h3>
-        <p className="text-sm text-[var(--text-secondary)] mb-4">
-          Our API works with any CI/CD platform. Use the score endpoint:
-        </p>
-        <pre className="overflow-x-auto rounded-lg bg-[var(--bg-primary)] border border-[var(--border-subtle)] p-3 font-mono text-xs text-[var(--text-secondary)]">
-{`curl -s https://mcp-scanner-kappa.vercel.app/api/v1/score/{owner}/{repo}
-
-# Returns: { "grade": "A", "score": 95, "findings": {...} }`}
-        </pre>
+      <div className="mt-10 rounded-xl border border-white/10 bg-card p-6">
+        <h3 className="text-sm font-medium text-foreground mb-3">Other CI/CD Platforms</h3>
+        <p className="text-sm text-muted mb-4">Our API works with any CI/CD platform. Use the score endpoint:</p>
+        <pre className="code-block">{`curl -s https://mcp-scanner-kappa.vercel.app/api/v1/score/{owner}/{repo}\n\n# Returns: { "grade": "A", "score": 95, "findings": {...} }`}</pre>
       </div>
     </div>
   );
