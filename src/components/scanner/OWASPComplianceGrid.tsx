@@ -21,7 +21,7 @@ export function OWASPComplianceGrid({ compliance, percentage }: Props) {
       <div className="flex items-center justify-between">
         <div>
           <h3 className="font-display text-lg font-semibold">OWASP MCP Top 10 Compliance</h3>
-          <p className="text-sm text-[var(--text-secondary)]">
+          <p className="text-sm text-muted">
             Coverage of the official OWASP MCP security framework
           </p>
         </div>
@@ -29,7 +29,7 @@ export function OWASPComplianceGrid({ compliance, percentage }: Props) {
           <p className={`font-mono text-2xl font-bold ${percentage >= 80 ? "text-emerald-400" : percentage >= 50 ? "text-amber-400" : "text-red-400"}`}>
             {percentage}%
           </p>
-          <p className="text-xs text-[var(--text-tertiary)]">Compliant</p>
+          <p className="text-xs text-muted-foreground">Compliant</p>
         </div>
       </div>
 
@@ -52,8 +52,8 @@ export function OWASPComplianceGrid({ compliance, percentage }: Props) {
             )}
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
-                <span className="font-mono text-xs text-[var(--text-tertiary)]">{item.id}</span>
-                <span className="text-sm font-medium text-[var(--text-primary)] truncate">
+                <span className="font-mono text-xs text-muted-foreground">{item.id}</span>
+                <span className="text-sm font-medium text-foreground truncate">
                   {item.title}
                 </span>
               </div>
@@ -63,7 +63,7 @@ export function OWASPComplianceGrid({ compliance, percentage }: Props) {
                     {item.findingsCount} finding{item.findingsCount !== 1 ? "s" : ""}
                   </span>
                   {item.maxSeverity && (
-                    <span className="text-[var(--text-tertiary)]">
+                    <span className="text-muted-foreground">
                       {" "}(max: {item.maxSeverity})
                     </span>
                   )}

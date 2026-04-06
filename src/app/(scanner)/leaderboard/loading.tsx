@@ -12,10 +12,10 @@ export default function LeaderboardLoading() {
           <Skeleton key={i} className="h-8 w-20 rounded-full" />
         ))}
       </div>
-      <div className="rounded-xl border border-[var(--border-subtle)] overflow-hidden">
+      <div className="rounded-xl border border-white/10 overflow-hidden">
         <Skeleton className="h-10 w-full" />
         {Array.from({ length: 10 }, (_, i) => (
-          <Skeleton key={i} className="h-14 w-full border-t border-[var(--border-subtle)]" />
+          <Skeleton key={i} className="h-14 w-full border-t border-white/10" />
         ))}
       </div>
     </div>

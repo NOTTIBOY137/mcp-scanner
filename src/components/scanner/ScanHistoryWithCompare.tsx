@@ -46,7 +46,7 @@ export function ScanHistoryWithCompare({
           {selected.length === 2 && !comparing && (
             <button
               onClick={startCompare}
-              className="rounded-lg bg-[var(--accent)]/15 px-3 py-1.5 text-xs font-medium text-[var(--accent)] ring-1 ring-[var(--accent)]/30 hover:bg-[var(--accent)]/25 transition-colors"
+              className="rounded-lg bg-brand-500/15 px-3 py-1.5 text-xs font-medium text-brand-500 ring-1 ring-brand-500/30 hover:bg-brand-500/25 transition-colors"
             >
               Compare
             </button>
@@ -54,7 +54,7 @@ export function ScanHistoryWithCompare({
           {(selected.length > 0 || comparing) && (
             <button
               onClick={clearCompare}
-              className="rounded-lg bg-[var(--bg-tertiary)]/15 px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] ring-1 ring-[var(--card-border)] hover:bg-[var(--bg-tertiary)]/25 transition-colors"
+              className="rounded-lg bg-zinc-900/15 px-3 py-1.5 text-xs font-medium text-muted ring-1 ring-white/10 hover:bg-zinc-900/25 transition-colors"
             >
               Clear
             </button>
@@ -72,13 +72,13 @@ export function ScanHistoryWithCompare({
       )}
 
       {scanHistory.length === 0 ? (
-        <p className="text-[var(--text-secondary)]">No scans yet.</p>
+        <p className="text-muted">No scans yet.</p>
       ) : (
         <div className="space-y-2">
           {scanHistory.map((scan) => (
             <div
               key={scan.id}
-              className="card flex items-center justify-between transition-colors hover:border-[var(--accent)]"
+              className="card flex items-center justify-between transition-colors hover:border-brand-500"
             >
               <div className="flex items-center gap-3">
                 <input
@@ -88,26 +88,26 @@ export function ScanHistoryWithCompare({
                   disabled={
                     !selected.includes(scan.id) && selected.length >= 2
                   }
-                  className="h-4 w-4 rounded border-[var(--card-border)] bg-[var(--bg-secondary)] text-[var(--accent)] focus:ring-[var(--accent)]/30"
+                  className="h-4 w-4 rounded border-white/10 bg-card text-brand-500 focus:ring-brand-500/30"
                 />
                 <Link
                   href={`/results/${scan.id}`}
                   className="flex items-center gap-3"
                 >
-                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--bg-secondary)] text-sm font-bold">
+                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-card text-sm font-bold">
                     {scan.grade ?? "?"}
                   </span>
                   <div>
                     <span className="text-sm font-medium">
                       Score: {scan.score ?? "\u2014"}/100
                     </span>
-                    <span className="ml-3 text-xs text-[var(--text-secondary)]">
+                    <span className="ml-3 text-xs text-muted">
                       {scan.findingsCount} findings
                     </span>
                   </div>
                 </Link>
               </div>
-              <div className="text-xs text-[var(--text-secondary)]">
+              <div className="text-xs text-muted">
                 {new Date(scan.createdAt).toLocaleDateString()}
                 {scan.commitSha && (
                   <span className="ml-2 font-mono">

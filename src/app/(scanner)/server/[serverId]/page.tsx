@@ -85,22 +85,22 @@ export default async function ServerPage({
         <GradeBadge grade={server.latestGrade} size="lg" />
         <div>
           <h1 className="text-2xl font-bold">{server.name}</h1>
-          <p className="text-[var(--text-secondary)]">
+          <p className="text-muted">
             {server.owner}/{server.repo}
           </p>
           {server.description && (
-            <p className="mt-1 text-sm text-[var(--text-secondary)]">
+            <p className="mt-1 text-sm text-muted">
               {server.description}
             </p>
           )}
-          <div className="mt-2 flex flex-wrap gap-4 text-sm text-[var(--text-secondary)]">
+          <div className="mt-2 flex flex-wrap gap-4 text-sm text-muted">
             {(server.stars ?? 0) > 0 && <span>{server.stars} stars</span>}
             {server.language && <span>{server.language}</span>}
             <a
               href={server.repoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[var(--accent)] hover:underline"
+              className="text-brand-500 hover:underline"
             >
               View on GitHub
             </a>
@@ -125,7 +125,7 @@ export default async function ServerPage({
               </span>
             )}
             {claimStatus === "claimed-by-other" && (
-              <span className="mt-3 inline-flex items-center gap-1 rounded-full bg-[var(--bg-tertiary)]/15 px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] ring-1 ring-[var(--card-border)]">
+              <span className="mt-3 inline-flex items-center gap-1 rounded-full bg-zinc-900/15 px-3 py-1.5 text-xs font-medium text-muted ring-1 ring-white/10">
                 Claimed
               </span>
             )}
@@ -141,7 +141,7 @@ export default async function ServerPage({
       {/* Grade trend */}
       {scanHistory.length > 1 && (
         <section>
-          <h2 className="mb-2 text-sm font-semibold text-[var(--text-secondary)]">Grade Trend</h2>
+          <h2 className="mb-2 text-sm font-semibold text-muted">Grade Trend</h2>
           <div className="flex items-end gap-1 overflow-x-auto pb-1 h-12">
             {scanHistory
               .slice()
@@ -151,7 +151,7 @@ export default async function ServerPage({
                 const height = Math.max(4, (score / 100) * 48);
                 const color =
                   score >= 90 ? "bg-green-500" :
-                  score >= 70 ? "bg-[var(--accent)]" :
+                  score >= 70 ? "bg-brand-500" :
                   score >= 50 ? "bg-yellow-500" :
                   "bg-red-500";
                 return (

@@ -67,24 +67,24 @@ export function ApiKeyCard({
     <div className="space-y-4">
       {/* Newly created key banner */}
       {newKey && (
-        <div className="card border-green-500/30 bg-green-500/5">
+        <div className="rounded-lg border border-green-500/30 bg-green-500/5 p-4">
           <p className="text-sm font-medium text-green-400 mb-2">
             API key created. Copy it now — you won&apos;t see it again.
           </p>
           <div className="flex items-center gap-2">
-            <code className="flex-1 rounded bg-[var(--bg-secondary)] px-3 py-2 text-sm font-mono text-[var(--text-primary)] break-all">
+            <code className="flex-1 rounded-lg bg-zinc-900 px-3 py-2 text-sm font-mono text-foreground break-all">
               {newKey}
             </code>
             <button
               onClick={copyKey}
-              className="shrink-0 rounded-md bg-green-600 px-3 py-2 text-sm font-medium text-white hover:bg-green-500 transition-colors"
+              className="shrink-0 rounded-lg bg-green-600 px-3 py-2 text-sm font-medium text-white hover:bg-green-500 transition-colors"
             >
               {copied ? "Copied!" : "Copy"}
             </button>
           </div>
           <button
             onClick={() => setNewKey(null)}
-            className="mt-2 text-xs text-[var(--text-tertiary)] hover:text-[var(--text-primary)]"
+            className="mt-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
             Dismiss
           </button>
@@ -93,24 +93,24 @@ export function ApiKeyCard({
 
       {/* Existing keys */}
       {keys.length === 0 && !newKey ? (
-        <p className="text-sm text-[var(--text-secondary)]">
+        <p className="text-sm text-muted">
           No API keys yet. Create one to start using the API.
         </p>
       ) : (
         keys.map((key) => (
           <div
             key={key.id}
-            className="card flex items-center justify-between"
+            className="flex items-center justify-between rounded-lg border border-white/10 bg-zinc-900 px-4 py-3"
           >
             <div>
-              <code className="text-sm font-mono text-[var(--text-primary)]">
+              <code className="text-sm font-mono text-foreground">
                 {key.keyPrefix}****
               </code>
-              <span className="ml-3 text-xs text-[var(--text-secondary)]">
+              <span className="ml-3 text-xs text-muted">
                 {key.name}
               </span>
               {key.lastUsedAt && (
-                <span className="ml-3 text-xs text-[var(--text-secondary)]">
+                <span className="ml-3 text-xs text-muted">
                   Last used{" "}
                   {new Date(key.lastUsedAt).toLocaleDateString()}
                 </span>
@@ -132,7 +132,7 @@ export function ApiKeyCard({
         <button
           onClick={createKey}
           disabled={loading}
-          className="rounded-md bg-[var(--accent)] px-4 py-2 text-sm font-medium text-white hover:brightness-110 transition-colors disabled:opacity-50"
+          className="rounded-lg bg-white px-6 py-3 text-sm font-medium text-black hover:bg-white/90 transition-colors disabled:opacity-50"
         >
           {loading ? "Creating..." : "Generate API Key"}
         </button>

@@ -47,7 +47,7 @@ export function CircularProgress({
         cy="60"
         r={radius}
         fill="none"
-        stroke="var(--bg-tertiary)"
+        stroke="#27272a"
         strokeWidth="8"
       />
       {/* Progress arc */}
@@ -73,7 +73,7 @@ export function CircularProgress({
         fill={color}
         fontSize="28"
         fontWeight="bold"
-        fontFamily="var(--font-mono), monospace"
+        fontFamily="'Geist Mono', monospace"
       >
         {score}
       </text>
@@ -82,10 +82,10 @@ export function CircularProgress({
         x="60"
         y="76"
         textAnchor="middle"
-        fill="var(--text-secondary)"
+        fill="#a1a1a1"
         fontSize="14"
         fontWeight="500"
-        fontFamily="var(--font-mono), monospace"
+        fontFamily="'Geist Mono', monospace"
       >
         {grade}
       </text>

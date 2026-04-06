@@ -16,7 +16,7 @@ export function GradeBadge({
   if (!grade) {
     return (
       <div
-        className={`${sizeClasses[size]} flex shrink-0 items-center justify-center rounded-full bg-[var(--bg-tertiary)] font-mono font-bold text-[var(--text-tertiary)]`}
+        className={`${sizeClasses[size]} flex shrink-0 items-center justify-center rounded-full bg-zinc-900 font-mono font-bold text-muted-foreground`}
       >
         ?
       </div>

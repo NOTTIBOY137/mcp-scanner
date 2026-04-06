@@ -55,8 +55,8 @@ export function WaitlistForm({
         onClick={() => setShowForm(true)}
         className={`w-full rounded-md px-4 py-2.5 text-sm font-medium transition-colors ${
           recommended
-            ? "bg-[var(--accent)] text-white hover:brightness-110"
-            : "bg-[var(--bg-secondary)] text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)]"
+            ? "bg-brand-500 text-white hover:brightness-110"
+            : "bg-card text-foreground hover:bg-zinc-900"
         }`}
       >
         {buttonLabel}
@@ -72,7 +72,7 @@ export function WaitlistForm({
         onChange={(e) => setEmail(e.target.value)}
         placeholder="you@example.com"
         required
-        className="w-full rounded-md border border-[var(--card-border)] bg-[var(--bg-secondary)]/50 px-3 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:border-[var(--accent)] focus:outline-none"
+        className="w-full rounded-md border border-white/10 bg-card/50 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-brand-500 focus:outline-none"
       />
       {status === "error" && (
         <p className="text-xs text-red-400">{errorMsg}</p>
@@ -82,8 +82,8 @@ export function WaitlistForm({
         disabled={status === "loading"}
         className={`w-full rounded-md px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50 ${
           recommended
-            ? "bg-[var(--accent)] text-white hover:brightness-110"
-            : "bg-[var(--bg-secondary)] text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)]"
+            ? "bg-brand-500 text-white hover:brightness-110"
+            : "bg-card text-foreground hover:bg-zinc-900"
         }`}
       >
         {status === "loading" ? "Joining..." : "Join Waitlist"}

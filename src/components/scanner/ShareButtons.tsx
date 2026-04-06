@@ -69,7 +69,7 @@ export function ShareButtons({
       <button
         type="button"
         onClick={copyLink}
-        className={`${btnClass} bg-[var(--bg-tertiary)] text-[var(--text-primary)] ring-1 ring-[var(--border-subtle)] hover:ring-[var(--border-accent)]`}
+        className={`${btnClass} bg-zinc-900 text-foreground ring-1 ring-white/10 hover:ring-brand-500/20`}
       >
         {copied ? (
           <>

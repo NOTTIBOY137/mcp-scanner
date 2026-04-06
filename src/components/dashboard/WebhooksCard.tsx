@@ -10,20 +10,14 @@ interface Webhook {
   createdAt: string;
 }
 
-export function WebhooksCard({ plan }: { plan: string }) {
+export function WebhooksCard() {
   const [webhooks, setWebhooks] = useState<Webhook[]>([]);
   const [loading, setLoading] = useState(true);
   const [newUrl, setNewUrl] = useState("");
   const [creating, setCreating] = useState(false);
   const [newSecret, setNewSecret] = useState<string | null>(null);
 
-  const isPaid = plan === "pro" || plan === "team";
-
   useEffect(() => {
-    if (!isPaid) {
-      setLoading(false);
-      return;
-    }
     fetch("/api/webhooks")
       .then((r) => r.json())
       .then((data) => {
@@ -31,7 +25,7 @@ export function WebhooksCard({ plan }: { plan: string }) {
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [isPaid]);
+  }, []);
 
   async function createWebhook() {
     if (!newUrl) return;
@@ -73,35 +67,16 @@ export function WebhooksCard({ plan }: { plan: string }) {
     setWebhooks((prev) => prev.filter((wh) => wh.id !== id));
   }
 
-  if (!isPaid) {
-    return (
-      <div className="card">
-        <h3 className="text-sm font-semibold mb-2">Webhooks</h3>
-        <p className="text-sm text-[var(--text-secondary)]">
-          Webhook notifications are available on Pro and Team plans.
-        </p>
-        <a
-          href="/dashboard#billing"
-          className="mt-3 inline-flex items-center gap-2 rounded-lg bg-[var(--accent)]/15 px-4 py-2 text-sm font-medium text-[var(--accent)] ring-1 ring-[var(--accent)]/30 hover:bg-[var(--accent)]/25 transition-colors"
-        >
-          Upgrade to Pro
-        </a>
-      </div>
-    );
-  }
-
   if (loading) {
     return (
-      <div className="card animate-pulse">
-        <div className="h-4 w-48 bg-[var(--bg-tertiary)] rounded" />
+      <div className="animate-pulse">
+        <div className="h-4 w-48 bg-zinc-800 rounded" />
       </div>
     );
   }
 
   return (
-    <div className="card space-y-4">
-      <h3 className="text-sm font-semibold">Webhooks</h3>
-
+    <div className="space-y-4">
       {/* Add webhook form */}
       <div className="flex gap-2">
         <input
@@ -109,12 +84,12 @@ export function WebhooksCard({ plan }: { plan: string }) {
           value={newUrl}
           onChange={(e) => setNewUrl(e.target.value)}
           placeholder="https://your-server.com/webhook"
-          className="flex-1 rounded-lg bg-[var(--bg-secondary)] px-3 py-2 text-sm border border-[var(--card-border)] focus:border-[var(--accent)] focus:outline-none"
+          className="input flex-1 rounded-lg px-3 py-2 text-sm"
         />
         <button
           onClick={createWebhook}
           disabled={creating || !newUrl}
-          className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-medium text-white hover:brightness-110 disabled:opacity-50 transition-colors"
+          className="rounded-lg bg-white px-6 py-3 text-sm font-medium text-black hover:bg-white/90 disabled:opacity-50 transition-colors"
         >
           {creating ? "Adding..." : "Add"}
         </button>
@@ -126,20 +101,20 @@ export function WebhooksCard({ plan }: { plan: string }) {
           <p className="text-xs text-green-400 font-medium mb-1">
             Webhook secret (shown only once):
           </p>
-          <code className="text-xs break-all">{newSecret}</code>
+          <code className="text-xs font-mono break-all text-foreground">{newSecret}</code>
         </div>
       )}
 
       {/* Webhook list */}
       {webhooks.length === 0 ? (
-        <p className="text-sm text-[var(--text-secondary)]">No webhooks configured yet.</p>
+        <p className="text-sm text-muted">No webhooks configured yet.</p>
       ) : (
         <div className="space-y-2">
           {webhooks.map((wh) => (
-            <div key={wh.id} className="flex items-center justify-between bg-[var(--bg-secondary)]/50 rounded-lg px-3 py-2">
+            <div key={wh.id} className="flex items-center justify-between bg-zinc-900 rounded-lg px-3 py-2">
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-mono truncate">{wh.url}</p>
-                <p className="text-xs text-[var(--text-secondary)]">{wh.events.join(", ")}</p>
+                <p className="text-sm font-mono text-foreground truncate">{wh.url}</p>
+                <p className="text-xs text-muted">{wh.events.join(", ")}</p>
               </div>
               <div className="flex items-center gap-2 ml-3">
                 <button
@@ -147,14 +122,14 @@ export function WebhooksCard({ plan }: { plan: string }) {
                   className={`text-xs px-2 py-1 rounded-full ${
                     wh.active
                       ? "bg-green-500/15 text-green-400"
-                      : "bg-[var(--bg-tertiary)]/50 text-[var(--text-secondary)]"
+                      : "bg-zinc-800 text-muted"
                   }`}
                 >
                   {wh.active ? "Active" : "Paused"}
                 </button>
                 <button
                   onClick={() => deleteWebhook(wh.id)}
-                  className="text-xs text-red-400 hover:text-red-300"
+                  className="text-xs text-red-400 hover:text-red-300 hover:bg-white/5 rounded-md px-2 py-1 transition-colors"
                 >
                   Delete
                 </button>

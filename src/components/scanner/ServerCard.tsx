@@ -22,10 +22,10 @@ export function ServerCard({
   return (
     <Link
       href={`/server/${server.id}`}
-      className="group flex items-center gap-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-secondary)] p-5 transition-all hover:border-[var(--border-accent)] hover:-translate-y-0.5 hover:shadow-lg hover:shadow-cyan-500/5"
+      className="group flex items-center gap-4 rounded-xl border border-white/10 bg-card p-5 transition-all hover:border-brand-500/20 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-cyan-500/5"
     >
       {rank != null && (
-        <span className="hidden sm:flex w-6 text-center font-mono text-sm text-[var(--text-tertiary)]">
+        <span className="hidden sm:flex w-6 text-center font-mono text-sm text-muted-foreground">
           {rank}
         </span>
       )}
@@ -34,20 +34,20 @@ export function ServerCard({
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <h3 className="truncate font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent-glow)] transition-colors">
+          <h3 className="truncate font-semibold text-foreground group-hover:text-brand-400 transition-colors">
             {server.name}
           </h3>
           {server.latestScore !== null && (
-            <span className="font-mono text-xs text-[var(--text-tertiary)]">
+            <span className="font-mono text-xs text-muted-foreground">
               {server.latestScore}/100
             </span>
           )}
         </div>
-        <p className="truncate text-sm text-[var(--text-tertiary)]">
+        <p className="truncate text-sm text-muted-foreground">
           {server.owner}/{server.repo}
         </p>
         {server.latestScore !== null && (
-          <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-[var(--bg-primary)]">
+          <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-background">
             <div
               className="h-full rounded-full transition-all duration-700"
               style={{
@@ -58,7 +58,7 @@ export function ServerCard({
           </div>
         )}
       </div>
-      <div className="hidden sm:flex flex-col items-end gap-1 text-xs text-[var(--text-tertiary)]">
+      <div className="hidden sm:flex flex-col items-end gap-1 text-xs text-muted-foreground">
         {(server.stars ?? 0) > 0 && (
           <span className="flex items-center gap-1">
             <Star className="h-3 w-3" />

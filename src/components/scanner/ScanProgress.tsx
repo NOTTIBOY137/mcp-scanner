@@ -98,18 +98,18 @@ export function ScanProgress({ scanId }: { scanId: string }) {
                 {isDone || isComplete ? (
                   <CheckCircle2 className="h-5 w-5 text-emerald-400" />
                 ) : isActive ? (
-                  <Loader2 className="h-5 w-5 text-[var(--accent)] animate-spin" />
+                  <Loader2 className="h-5 w-5 text-brand-500 animate-spin" />
                 ) : (
-                  <Circle className="h-4 w-4 text-[var(--text-tertiary)]" />
+                  <Circle className="h-4 w-4 text-muted-foreground" />
                 )}
               </div>
               <span
                 className={`text-sm ${
                   isDone || isComplete
-                    ? "text-[var(--text-secondary)]"
+                    ? "text-muted"
                     : isActive
-                      ? "text-[var(--accent)] font-medium"
-                      : "text-[var(--text-tertiary)]"
+                      ? "text-brand-500 font-medium"
+                      : "text-muted-foreground"
                 }`}
               >
                 {step.label}
@@ -148,7 +148,7 @@ export function ScanProgress({ scanId }: { scanId: string }) {
       )}
 
       {!isComplete && !isFailed && (
-        <p className="text-center text-xs text-[var(--text-tertiary)]">
+        <p className="text-center text-xs text-muted-foreground">
           Usually takes 10-30 seconds
         </p>
       )}

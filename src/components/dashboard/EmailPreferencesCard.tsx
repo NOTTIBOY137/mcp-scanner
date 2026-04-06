@@ -27,19 +27,18 @@ export function EmailPreferencesCard() {
 
   if (loading) {
     return (
-      <div className="card animate-pulse">
-        <div className="h-4 w-48 bg-[var(--bg-tertiary)] rounded" />
+      <div className="animate-pulse">
+        <div className="h-4 w-48 bg-zinc-800 rounded" />
       </div>
     );
   }
 
   return (
-    <div className="card space-y-4">
-      <h3 className="text-sm font-semibold">Email Notifications</h3>
+    <div className="space-y-4">
       <label className="flex items-center justify-between">
         <div>
-          <span className="text-sm">Scan alerts</span>
-          <p className="text-xs text-[var(--text-secondary)]">
+          <span className="text-sm text-foreground">Scan alerts</span>
+          <p className="text-xs text-muted">
             Get notified when scans complete on your claimed servers
           </p>
         </div>
@@ -51,7 +50,7 @@ export function EmailPreferencesCard() {
             update("scanAlerts", !scanAlerts);
           }}
           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-            scanAlerts ? "bg-[var(--accent)]" : "bg-[var(--bg-tertiary)]"
+            scanAlerts ? "bg-brand-500" : "bg-zinc-700"
           }`}
         >
           <span
@@ -63,8 +62,8 @@ export function EmailPreferencesCard() {
       </label>
       <label className="flex items-center justify-between">
         <div>
-          <span className="text-sm">Marketing emails</span>
-          <p className="text-xs text-[var(--text-secondary)]">
+          <span className="text-sm text-foreground">Marketing emails</span>
+          <p className="text-xs text-muted">
             Receive product updates and announcements
           </p>
         </div>
@@ -76,7 +75,7 @@ export function EmailPreferencesCard() {
             update("marketingEmails", !marketingEmails);
           }}
           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-            marketingEmails ? "bg-[var(--accent)]" : "bg-[var(--bg-tertiary)]"
+            marketingEmails ? "bg-brand-500" : "bg-zinc-700"
           }`}
         >
           <span

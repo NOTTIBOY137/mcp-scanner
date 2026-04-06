@@ -22,19 +22,19 @@ function Code({ children, title }: { children: string; title?: string }) {
   const [copied, setCopied] = useState(false);
   return (
     <div className="relative group my-4">
-      {title && <div className="text-xs text-[var(--fg-ghost)] border border-[var(--border)] border-b-0 rounded-t-lg px-4 py-2" style={{ background: "rgba(255,255,255,0.02)" }}>{title}</div>}
+      {title && <div className="text-xs text-muted-foreground border border-white/10 border-b-0 rounded-t-lg px-4 py-2" style={{ background: "rgba(255,255,255,0.03)" }}>{title}</div>}
       <pre className={`code-block ${title ? "!rounded-t-none !border-t-0" : ""}`}><code>{children}</code></pre>
-      <button onClick={() => { navigator.clipboard.writeText(children); setCopied(true); setTimeout(() => setCopied(false), 2000); }} className="absolute top-2 right-2 text-xs text-[var(--fg-ghost)] hover:text-[var(--fg-muted)] opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 rounded border border-[var(--border)]" style={{ background: "var(--bg)" }}>{copied ? "Copied" : "Copy"}</button>
+      <button onClick={() => { navigator.clipboard.writeText(children); setCopied(true); setTimeout(() => setCopied(false), 2000); }} className="absolute top-2 right-2 text-xs text-muted-foreground hover:text-muted opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 rounded border border-white/10" style={{ background: "#111111" }}>{copied ? "Copied" : "Copy"}</button>
     </div>
   );
 }
 
 function P({ children }: { children: React.ReactNode }) {
-  return <p className="text-[var(--fg-muted)] leading-relaxed text-pretty mb-4">{children}</p>;
+  return <p className="text-muted leading-relaxed text-pretty mb-4">{children}</p>;
 }
 
 function Inline({ children }: { children: string }) {
-  return <code className="text-[13px] px-1.5 py-0.5 rounded border border-[var(--border)]" style={{ background: "rgba(255,255,255,0.03)", fontFamily: "'Geist Mono', monospace" }}>{children}</code>;
+  return <code className="text-[13px] px-1.5 py-0.5 rounded border border-white/10" style={{ background: "rgba(255,255,255,0.03)", fontFamily: "'Geist Mono', monospace" }}>{children}</code>;
 }
 
 export default function DocsPage() {
@@ -46,12 +46,12 @@ export default function DocsPage() {
         <nav className="sticky top-24 space-y-6" aria-label="Documentation">
           {nav.map((s) => (
             <div key={s.group}>
-              <p className="text-[11px] font-medium text-[var(--fg-ghost)] uppercase tracking-wider mb-2">{s.group}</p>
+              <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-2">{s.group}</p>
               <ul className="space-y-0.5">
                 {s.items.map((item) => (
                   <li key={item.id}>
                     <button onClick={() => { setActive(item.id); document.getElementById(item.id)?.scrollIntoView({ behavior: "smooth", block: "start" }); }}
-                      className={`block w-full text-left text-[13px] py-1.5 px-3 rounded-md transition-colors ${active === item.id ? "text-[var(--fg)] bg-[var(--bg-muted)]" : "text-[var(--fg-faint)] hover:text-[var(--fg-muted)]"}`}>
+                      className={`block w-full text-left text-[13px] py-1.5 px-3 rounded-md transition-colors ${active === item.id ? "text-foreground bg-white/5" : "text-muted-foreground hover:text-muted"}`}>
                       {item.label}
                     </button>
                   </li>
@@ -72,7 +72,7 @@ export default function DocsPage() {
           <h2 className="text-xl font-medium tracking-tight mb-4">Quick Start</h2>
           <P>Scan any public GitHub repository with a single API call:</P>
           <Code title="Terminal">{`curl https://mcp-scanner-kappa.vercel.app/api/v1/score/modelcontextprotocol/servers`}</Code>
-          <P>Or use the <Link href="/scan" className="text-[var(--accent)] hover:underline">web interface</Link> — paste a GitHub URL and get results in seconds.</P>
+          <P>Or use the <Link href="/scan" className="text-brand-400 hover:underline">web interface</Link> — paste a GitHub URL and get results in seconds.</P>
         </section>
 
         <section id="source-scan" className="mb-20">
@@ -92,7 +92,7 @@ export default function DocsPage() {
           <Code title="POST /api/scan/config">{`{
   "config": "{ \\"mcpServers\\": { ... } }"
 }`}</Code>
-          <P>Or use the <Link href="/config-scan" className="text-[var(--accent)] hover:underline">web interface</Link> to paste your config.</P>
+          <P>Or use the <Link href="/config-scan" className="text-brand-400 hover:underline">web interface</Link> to paste your config.</P>
         </section>
 
         <section id="bulk-scan" className="mb-20">
@@ -108,7 +108,7 @@ export default function DocsPage() {
 
         <section id="github-actions" className="mb-20">
           <h2 className="text-xl font-medium tracking-tight mb-4">GitHub Actions</h2>
-          <P>Add MCP security scanning to your CI/CD pipeline. Use the <Link href="/integrations" className="text-[var(--accent)] hover:underline">generator</Link> or copy this workflow:</P>
+          <P>Add MCP security scanning to your CI/CD pipeline. Use the <Link href="/integrations" className="text-brand-400 hover:underline">generator</Link> or copy this workflow:</P>
           <Code title=".github/workflows/mcp-scan.yml">{`name: MCP Security Scan
 on: [push, pull_request]
 jobs:
@@ -133,7 +133,7 @@ jobs:
         <section id="vscode" className="mb-20">
           <h2 className="text-xl font-medium tracking-tight mb-4">VS Code Extension</h2>
           <P>MCP Config Guardian provides real-time inline warnings as you edit MCP config files. Compatible with VS Code, Cursor, and Windsurf.</P>
-          <p className="text-sm text-[var(--fg-ghost)]">Coming soon to the VS Code Marketplace and Open VSX.</p>
+          <p className="text-sm text-muted-foreground">Coming soon to the VS Code Marketplace and Open VSX.</p>
         </section>
 
         <section id="api-score" className="mb-20">
@@ -196,8 +196,8 @@ jobs:
               ["MCP10", "Logging & Monitoring Deficiencies"],
             ].map(([id, title]) => (
               <div key={id} className="flex items-center gap-3 text-sm">
-                <span className="text-[var(--accent)] w-14 shrink-0" style={{ fontFamily: "'Geist Mono', monospace", fontSize: 13 }}>{id}</span>
-                <span className="text-[var(--fg-muted)]">{title}</span>
+                <span className="text-brand-400 w-14 shrink-0" style={{ fontFamily: "'Geist Mono', monospace", fontSize: 13 }}>{id}</span>
+                <span className="text-muted">{title}</span>
               </div>
             ))}
           </div>

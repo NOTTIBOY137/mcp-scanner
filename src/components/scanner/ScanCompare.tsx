@@ -37,14 +37,14 @@ export function ScanCompare({
   }, [oldScanId, newScanId]);
 
   if (loading) {
-    return <div className="animate-pulse h-32 bg-[var(--bg-secondary)]/50 rounded-lg" />;
+    return <div className="animate-pulse h-32 bg-card/50 rounded-lg" />;
   }
 
   if (!data) {
-    return <p className="text-sm text-[var(--text-secondary)]">Unable to load comparison.</p>;
+    return <p className="text-sm text-muted">Unable to load comparison.</p>;
   }
 
-  const deltaColor = data.scoreDelta > 0 ? "text-green-400" : data.scoreDelta < 0 ? "text-red-400" : "text-[var(--text-secondary)]";
+  const deltaColor = data.scoreDelta > 0 ? "text-green-400" : data.scoreDelta < 0 ? "text-red-400" : "text-muted";
   const deltaSign = data.scoreDelta > 0 ? "+" : "";
 
   return (
@@ -54,13 +54,13 @@ export function ScanCompare({
       {/* Grade badges side by side */}
       <div className="flex items-center gap-4">
         <div className="text-center">
-          <p className="text-xs text-[var(--text-secondary)] mb-1">Previous</p>
+          <p className="text-xs text-muted mb-1">Previous</p>
           <div className="text-2xl font-bold">{data.oldScan.grade ?? "—"}</div>
           <p className="text-xs">{data.oldScan.score ?? "—"}/100</p>
         </div>
-        <div className="text-lg text-[var(--text-secondary)]">&rarr;</div>
+        <div className="text-lg text-muted">&rarr;</div>
         <div className="text-center">
-          <p className="text-xs text-[var(--text-secondary)] mb-1">Latest</p>
+          <p className="text-xs text-muted mb-1">Latest</p>
           <div className="text-2xl font-bold">{data.newScan.grade ?? "—"}</div>
           <p className="text-xs">{data.newScan.score ?? "—"}/100</p>
         </div>
@@ -80,7 +80,7 @@ export function ScanCompare({
               <div key={i} className="flex items-center gap-2 text-xs bg-red-500/10 rounded px-2 py-1">
                 <span className="uppercase font-medium text-red-400">{f.severity}</span>
                 <span className="truncate">{f.title}</span>
-                <span className="text-[var(--text-secondary)] font-mono ml-auto">{f.filePath}</span>
+                <span className="text-muted font-mono ml-auto">{f.filePath}</span>
               </div>
             ))}
           </div>
@@ -98,7 +98,7 @@ export function ScanCompare({
               <div key={i} className="flex items-center gap-2 text-xs bg-green-500/10 rounded px-2 py-1">
                 <span className="uppercase font-medium text-green-400">{f.severity}</span>
                 <span className="truncate line-through">{f.title}</span>
-                <span className="text-[var(--text-secondary)] font-mono ml-auto">{f.filePath}</span>
+                <span className="text-muted font-mono ml-auto">{f.filePath}</span>
               </div>
             ))}
           </div>
@@ -106,7 +106,7 @@ export function ScanCompare({
       )}
 
       {data.newFindings.length === 0 && data.fixedFindings.length === 0 && (
-        <p className="text-sm text-[var(--text-secondary)]">No changes in findings between scans.</p>
+        <p className="text-sm text-muted">No changes in findings between scans.</p>
       )}
     </div>
   );

@@ -41,7 +41,7 @@ export function BadgeGenerator({ appUrl }: { appUrl: string }) {
       <div>
         <label
           htmlFor="badge-repo"
-          className="mb-2 block text-sm font-medium text-[var(--text-secondary)]"
+          className="mb-2 block text-sm font-medium text-muted"
         >
           Enter your repository
         </label>
@@ -59,7 +59,7 @@ export function BadgeGenerator({ appUrl }: { appUrl: string }) {
         <>
           {/* Live preview */}
           <div className="card flex flex-col items-center gap-3">
-            <p className="text-xs text-[var(--text-tertiary)]">Live preview</p>
+            <p className="text-xs text-muted-foreground">Live preview</p>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={badgeUrl}
@@ -70,13 +70,13 @@ export function BadgeGenerator({ appUrl }: { appUrl: string }) {
 
           {/* Embed code */}
           <div className="space-y-3">
-            <div className="flex gap-1 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-tertiary)] p-1 w-fit">
+            <div className="flex gap-1 rounded-lg border border-white/10 bg-zinc-900 p-1 w-fit">
               <button
                 onClick={() => setTab("markdown")}
                 className={`rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
                   tab === "markdown"
-                    ? "bg-[var(--bg-hover)] text-[var(--text-primary)]"
-                    : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
+                    ? "bg-white/5 text-foreground"
+                    : "text-muted-foreground hover:text-muted"
                 }`}
               >
                 Markdown
@@ -85,16 +85,16 @@ export function BadgeGenerator({ appUrl }: { appUrl: string }) {
                 onClick={() => setTab("html")}
                 className={`rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
                   tab === "html"
-                    ? "bg-[var(--bg-hover)] text-[var(--text-primary)]"
-                    : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
+                    ? "bg-white/5 text-foreground"
+                    : "text-muted-foreground hover:text-muted"
                 }`}
               >
                 HTML
               </button>
             </div>
 
-            <div className="relative overflow-hidden rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-primary)]">
-              <pre className="overflow-x-auto p-4 font-mono text-sm text-[var(--text-secondary)]">
+            <div className="relative overflow-hidden rounded-lg border border-white/10 bg-background">
+              <pre className="overflow-x-auto p-4 font-mono text-sm text-muted">
                 {codeText}
               </pre>
               <button
@@ -109,8 +109,8 @@ export function BadgeGenerator({ appUrl }: { appUrl: string }) {
               </button>
             </div>
 
-            <p className="text-xs text-[var(--text-tertiary)]">
-              Replace <code className="text-[var(--text-secondary)] font-mono">SCAN_ID</code> with your
+            <p className="text-xs text-muted-foreground">
+              Replace <code className="text-muted font-mono">SCAN_ID</code> with your
               actual scan ID from the results page.
             </p>
           </div>
