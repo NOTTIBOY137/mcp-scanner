@@ -311,7 +311,7 @@ export default function HomePage() {
                 key={title}
                 variants={fadeSlide}
                 whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                className="group relative overflow-hidden rounded-xl border border-zinc-800 bg-gradient-to-b from-zinc-900/60 to-zinc-950/30 p-6 transition-colors duration-300 hover:border-zinc-700 cursor-pointer"
+                className="group relative overflow-hidden rounded-xl border border-zinc-800 bg-gradient-to-b from-zinc-900/60 to-zinc-950/30 p-6 transition-colors duration-300 hover:border-zinc-700"
               >
                 {/* Hover glow */}
                 <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
@@ -392,7 +392,7 @@ export default function HomePage() {
 
       {/* ════════ FOOTER ════════ */}
       <footer className="py-12 text-center border-t border-zinc-800">
-        <p className="text-sm text-zinc-600">
+        <p className="text-sm text-zinc-400">
           MCP Scanner — Free and open source
           <span className="mx-2">·</span>
           <a

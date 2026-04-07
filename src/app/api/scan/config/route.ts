@@ -3,7 +3,7 @@ import { z } from "zod";
 import { scanMcpConfig } from "@/scanner/config-scanner";
 
 const schema = z.object({
-  config: z.string().min(1, "Config JSON is required"),
+  config: z.string().min(1).max(1_000_000, "Config JSON is required"),
 });
 
 export async function POST(request: Request) {

@@ -146,7 +146,7 @@ export default async function LeaderboardPage({
             <a
               key={f.key}
               href={buildUrl({ filter: f.key, page: "1" })}
-              className={`text-sm font-medium transition-colors ${
+              aria-current={filter === f.key ? "page" : undefined} className={`text-sm font-medium transition-colors ${
                 filter === f.key ? "text-foreground" : "text-muted-foreground hover:text-muted"
               }`}
             >
@@ -157,7 +157,7 @@ export default async function LeaderboardPage({
         <form className="relative w-full sm:w-64" action="/leaderboard" method="GET">
           {filter !== "all" && <input type="hidden" name="filter" value={filter} />}
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" aria-hidden="true" />
-          <input name="q" type="text" placeholder="Search servers..." defaultValue={params.q} className="input pl-9 w-full" />
+          <input name="q" type="text" placeholder="Search servers..." defaultValue={params.q} aria-label="Search servers" className="input pl-9 w-full" />
         </form>
       </div>
 

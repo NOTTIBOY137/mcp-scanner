@@ -47,11 +47,11 @@ export default function ConfigScanPage() {
       </div>
 
       <div className="rounded-xl border border-white/10 bg-card p-6 space-y-4">
-        <label className="block text-sm text-muted">
+        <label htmlFor="config-input" className="block text-sm text-muted">
           MCP Configuration JSON
         </label>
         <textarea
-          value={config}
+          id="config-input" value={config}
           onChange={(e) => setConfig(e.target.value)}
           placeholder={`{
   "mcpServers": {

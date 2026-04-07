@@ -80,7 +80,7 @@ export function ScanForm() {
           />
           {showValidation && (
             <span className="absolute right-3 top-1/2 -translate-y-1/2">
-              {isValid ? <CheckCircle2 className="size-4 text-secure" /> : <XCircle className="size-4 text-critical" />}
+              {isValid ? <CheckCircle2 className="size-4 text-secure" aria-hidden="true" /> : <XCircle className="size-4 text-critical" aria-hidden="true" />}
             </span>
           )}
         </div>

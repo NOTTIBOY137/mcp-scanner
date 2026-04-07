@@ -24,7 +24,7 @@ function Code({ children, title }: { children: string; title?: string }) {
     <div className="relative group my-4">
       {title && <div className="text-xs text-muted-foreground border border-white/10 border-b-0 rounded-t-lg px-4 py-2" style={{ background: "rgba(255,255,255,0.03)" }}>{title}</div>}
       <pre className={`code-block ${title ? "!rounded-t-none !border-t-0" : ""}`}><code>{children}</code></pre>
-      <button onClick={() => { navigator.clipboard.writeText(children); setCopied(true); setTimeout(() => setCopied(false), 2000); }} className="absolute top-2 right-2 text-xs text-muted-foreground hover:text-muted opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 rounded border border-white/10" style={{ background: "#111111" }}>{copied ? "Copied" : "Copy"}</button>
+      <button onClick={() => { navigator.clipboard.writeText(children); setCopied(true); setTimeout(() => setCopied(false), 2000); }} className="absolute top-2 right-2 text-xs text-muted-foreground hover:text-muted opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity px-2 py-1 rounded border border-white/10" style={{ background: "#111111" }}>{copied ? "Copied" : "Copy"}</button>
     </div>
   );
 }
