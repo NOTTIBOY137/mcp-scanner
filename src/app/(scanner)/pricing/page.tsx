@@ -6,6 +6,7 @@ import { WaitlistForm } from "@/components/scanner/WaitlistForm";
 export const metadata: Metadata = {
   title: "Pricing",
   description: "MCP Scanner is free for everyone. Pro tier coming soon.",
+  alternates: { canonical: "/pricing" },
 };
 
 const freeFeatures = [

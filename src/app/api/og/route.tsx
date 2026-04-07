@@ -35,7 +35,7 @@ export async function GET(request: Request) {
           {description}
         </div>
         <div style={{ fontSize: 18, color: "#6366F1", marginTop: 40 }}>
-          mcp-scanner-kappa.vercel.app
+          mcpscanner.cloud
         </div>
       </div>
     ),

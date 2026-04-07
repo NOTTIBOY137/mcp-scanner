@@ -74,7 +74,7 @@ export default function IntegrationsPage() {
       <div className="mt-10 rounded-xl border border-white/10 bg-card p-6">
         <h3 className="text-sm font-medium text-foreground mb-3">Other CI/CD Platforms</h3>
         <p className="text-sm text-muted mb-4">Our API works with any CI/CD platform. Use the score endpoint:</p>
-        <pre className="code-block">{`curl -s https://mcp-scanner-kappa.vercel.app/api/v1/score/{owner}/{repo}\n\n# Returns: { "grade": "A", "score": 95, "findings": {...} }`}</pre>
+        <pre className="code-block">{`curl -s https://mcpscanner.cloud/api/v1/score/{owner}/{repo}\n\n# Returns: { "grade": "A", "score": 95, "findings": {...} }`}</pre>
       </div>
     </div>
   );

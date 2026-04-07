@@ -10,7 +10,7 @@ import "./globals.css";
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://mcp-scanner-kappa.vercel.app";
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://mcpscanner.cloud";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Scan a Server",
   description: "Scan any MCP server for security vulnerabilities. 122 rules across 15 categories.",
+  alternates: { canonical: "/scan" },
 };
 
 export default function ScanPage() {

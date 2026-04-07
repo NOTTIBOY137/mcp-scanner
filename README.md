@@ -30,12 +30,12 @@ MCP Scanner analyzes Model Context Protocol server source code for security vuln
 
 ### Scan a server
 
-Visit [mcp-scanner-kappa.vercel.app](https://mcp-scanner-kappa.vercel.app) and enter a GitHub repository URL.
+Visit [mcpscanner.cloud](https://mcpscanner.cloud) and enter a GitHub repository URL.
 
 ### Scan your MCP config
 
 ```bash
-curl -X POST https://mcp-scanner-kappa.vercel.app/api/scan/config \
+curl -X POST https://mcpscanner.cloud/api/scan/config \
   -H "Content-Type: application/json" \
   -d '{"config": "{\"mcpServers\": {\"my-server\": {\"command\": \"npx\", \"args\": [\"-y\", \"some-mcp-server\"], \"env\": {\"API_KEY\": \"sk-...\"}}}}"}'
 ```
@@ -47,7 +47,7 @@ curl -X POST https://mcp-scanner-kappa.vercel.app/api/scan/config \
 ### Get your security badge
 
 ```markdown
-[![MCP Security](https://mcp-scanner-kappa.vercel.app/api/badge/owner/repo.svg)](https://mcp-scanner-kappa.vercel.app)
+[![MCP Security](https://mcpscanner.cloud/api/badge/owner/repo.svg)](https://mcpscanner.cloud)
 ```
 
 ## What it detects
@@ -85,8 +85,8 @@ GET /api/v1/score/:owner/:repo
   "score": 78,
   "findings": { "critical": 0, "high": 2, "medium": 3, "low": 1 },
   "lastScanned": "2026-04-06T12:00:00Z",
-  "reportUrl": "https://mcp-scanner-kappa.vercel.app/report/...",
-  "badgeUrl": "https://mcp-scanner-kappa.vercel.app/api/badge/owner/repo.svg"
+  "reportUrl": "https://mcpscanner.cloud/report/...",
+  "badgeUrl": "https://mcpscanner.cloud/api/badge/owner/repo.svg"
 }
 ```
 
@@ -123,7 +123,7 @@ Content-Type: application/json
 {"repoUrls": ["https://github.com/owner/repo1", "https://github.com/owner/repo2"]}
 ```
 
-[Full API documentation](https://mcp-scanner-kappa.vercel.app/docs)
+[Full API documentation](https://mcpscanner.cloud/docs)
 
 ## MCPGuard — GitHub App
 
@@ -187,10 +187,10 @@ We welcome contributions. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## Links
 
-- [Live Scanner](https://mcp-scanner-kappa.vercel.app)
-- [API Documentation](https://mcp-scanner-kappa.vercel.app/docs)
+- [Live Scanner](https://mcpscanner.cloud)
+- [API Documentation](https://mcpscanner.cloud/docs)
 - [MCPGuard GitHub App](https://github.com/apps/mcpguard-scanner)
-- [Leaderboard](https://mcp-scanner-kappa.vercel.app/leaderboard)
+- [Leaderboard](https://mcpscanner.cloud/leaderboard)
 
 ## License
 

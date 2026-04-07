@@ -16,7 +16,7 @@ export async function POST(request: Request) {
   }
 
   const { owner, repo, failBelow } = parsed.data;
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://mcp-scanner-kappa.vercel.app";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://mcpscanner.cloud";
 
   const gradeOrder = ["A", "B", "C", "D", "F"];
   const failIndex = gradeOrder.indexOf(failBelow);

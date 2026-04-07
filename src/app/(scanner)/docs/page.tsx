@@ -71,7 +71,7 @@ export default function DocsPage() {
         <section id="quick-start" className="mb-20">
           <h2 className="text-xl font-medium tracking-tight mb-4">Quick Start</h2>
           <P>Scan any public GitHub repository with a single API call:</P>
-          <Code title="Terminal">{`curl https://mcp-scanner-kappa.vercel.app/api/v1/score/modelcontextprotocol/servers`}</Code>
+          <Code title="Terminal">{`curl https://mcpscanner.cloud/api/v1/score/modelcontextprotocol/servers`}</Code>
           <P>Or use the <Link href="/scan" className="text-brand-400 hover:underline">web interface</Link> — paste a GitHub URL and get results in seconds.</P>
         </section>
 
@@ -153,7 +153,7 @@ jobs:
         <section id="api-badge" className="mb-20">
           <h2 className="text-xl font-medium tracking-tight mb-4">GET /api/badge/:owner/:repo.svg</h2>
           <P>SVG badge for READMEs. Cached for 1 hour.</P>
-          <Code title="Markdown">{`![MCP Security](https://mcp-scanner-kappa.vercel.app/api/badge/owner/repo.svg)`}</Code>
+          <Code title="Markdown">{`![MCP Security](https://mcpscanner.cloud/api/badge/owner/repo.svg)`}</Code>
         </section>
 
         <section id="api-scan" className="mb-20">

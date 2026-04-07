@@ -10,6 +10,7 @@ export const revalidate = 600;
 export const metadata: Metadata = {
   title: "MCP Security Registry",
   description: "Every MCP server ranked by security score. Browse, search, and compare MCP servers.",
+  alternates: { canonical: "/leaderboard" },
 };
 
 const FILTERS = [

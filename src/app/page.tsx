@@ -130,7 +130,7 @@ export default function HomePage() {
           "@context": "https://schema.org",
           "@type": "WebApplication",
           name: "MCP Scanner",
-          url: "https://mcp-scanner-kappa.vercel.app",
+          url: "https://mcpscanner.cloud",
           applicationCategory: "SecurityApplication",
           operatingSystem: "Any",
           description:
@@ -193,7 +193,7 @@ export default function HomePage() {
             className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-zinc-50 leading-[1.1]"
           >
             Scan your MCP servers{" "}
-            <span className="bg-gradient-to-r from-brand-400 to-accent-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#6366F1] to-[#0EA5E9] bg-clip-text text-transparent">
               before attackers do
             </span>
           </motion.h1>

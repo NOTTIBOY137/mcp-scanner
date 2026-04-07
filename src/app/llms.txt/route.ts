@@ -5,10 +5,10 @@ export async function GET() {
 
 ## Core Pages
 
-- [Home](https://mcp-scanner-kappa.vercel.app/): Main landing page with security scanner
-- [Leaderboard](https://mcp-scanner-kappa.vercel.app/leaderboard): MCP servers ranked by security score
-- [Scan](https://mcp-scanner-kappa.vercel.app/scan): Run a security scan on any MCP server
-- [Docs](https://mcp-scanner-kappa.vercel.app/docs): API documentation and guides
+- [Home](https://mcpscanner.cloud/): Main landing page with security scanner
+- [Leaderboard](https://mcpscanner.cloud/leaderboard): MCP servers ranked by security score
+- [Scan](https://mcpscanner.cloud/scan): Run a security scan on any MCP server
+- [Docs](https://mcpscanner.cloud/docs): API documentation and guides
 
 ## Key Concepts
 
