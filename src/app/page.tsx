@@ -176,7 +176,7 @@ export default function HomePage() {
               className="group mx-auto mb-8 inline-flex items-center gap-3 rounded-full border border-zinc-800 bg-zinc-900/50 px-4 py-1.5 text-sm text-zinc-300 transition-all hover:border-zinc-700 hover:bg-zinc-800/50"
             >
               <span className="mr-1 size-2 rounded-full bg-secure animate-pulse" aria-hidden="true" />
-              Open Source — Free Forever
+              Trusted by 500+ developers — Join free
               <span className="h-4 w-px bg-zinc-700" aria-hidden="true" />
               <span className="flex items-center gap-1 text-zinc-400 group-hover:text-zinc-200 transition-colors">
                 Star on GitHub
