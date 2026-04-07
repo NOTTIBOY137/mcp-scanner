@@ -7,8 +7,6 @@ import {
   Bug,
   Lock,
   Globe,
-  BarChart3,
-  Github,
   ArrowRight,
   ChevronDown,
   Scan,

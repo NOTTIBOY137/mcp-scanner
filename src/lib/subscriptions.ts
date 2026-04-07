@@ -11,28 +11,22 @@ export interface Subscription {
   updatedAt: Date;
 }
 
-const FREE_DEFAULT: Subscription = {
-  id: "",
-  clerkUserId: "",
-  stripeCustomerId: "",
-  stripeSubscriptionId: null,
-  plan: "free",
-  status: "active",
-  currentPeriodEnd: null,
-  cancelAtPeriodEnd: false,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
 
 export async function getUserSubscription(
   clerkUserId: string
 ): Promise<Subscription> {
   // All features are free — skip DB query, return team-tier for everyone
   return {
-    ...FREE_DEFAULT,
+    id: "",
     clerkUserId,
+    stripeCustomerId: "",
+    stripeSubscriptionId: null,
     plan: "team",
     status: "active",
+    currentPeriodEnd: null,
+    cancelAtPeriodEnd: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
   };
 }
 

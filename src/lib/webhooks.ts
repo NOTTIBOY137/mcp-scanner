@@ -120,7 +120,7 @@ export async function deliverWebhooks(
         }
       }
 
-      if (statusCode !== 200 && statusCode !== null) {
+      if (statusCode !== null && (statusCode < 200 || statusCode >= 300)) {
         log.error("Webhook delivery exhausted retries", { webhookId: wh.id, attempts, lastStatusCode: statusCode });
       }
 
